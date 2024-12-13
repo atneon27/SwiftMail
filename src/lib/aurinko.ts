@@ -3,11 +3,11 @@
 import { auth } from "@clerk/nextjs/server"
 
 export const getAurinkoAuthUrl = async (serviceType: 'Google' | 'Office365') => {
-    // const { userId } = await auth()
+    const { userId } = await auth()
 
-    // if(!userId) {
-    //     throw new Error("Unauthorized!")
-    // }
+    if(!userId) {
+        throw new Error("Unauthorized!")
+    }
 
     const aurinkoUrl = new URL('https://api.aurinko.io/v1/auth/authorize')
 
