@@ -1,9 +1,7 @@
-import { Button } from "@/components/ui/button";
+import { LinkAccountButton } from "@/components/LinkAccountButton";
 
 export default function Home() {
   return (
-    <div>
-      Hello
-    </div>
+    <LinkAccountButton ButtonText="Link Account"/> 
   )
 }
