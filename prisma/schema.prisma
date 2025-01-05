@@ -11,9 +11,150 @@ datasource db {
 }
 
 model User {
-    id        String @id @default(cuid())
-    email     String @unique
+    id        String    @id @default(cuid())
+    email     String    @unique
     firstName String
     lastName  String
     imageUrl  String?
+    accounts  Account[]
+}
+
+model Account {
+    id           String @id @default(cuid())
+    userId       String
+    accessToken  String
+    emailAddress String
+    name         String
+
+    nextDeltaToken String?
+
+    user User @relation(fields: [userId], references: [id])
+    threads Thread[]
+    emailAddresss EmailAddress[]
+}
+
+model Thread {
+    id String @id @default(cuid())
+    subject String
+    lastMessageDate DateTime
+    participantIds String[]
+    accountId String
+    account Account @relation(fields: [accountId], references: [id])
+
+    done Boolean @default(false)
+    inboxStatus Boolean @default(true)
+    draftStatus Boolean @default(false)
+    sentStatus Boolean @default(false)
+    spamStatus Boolean @default(false)
+    spoofStatus Boolean @default(false)
+
+    emails Email[]
+
+    @@index([accountId])
+    @@index([done])
+    @@index([inboxStatus])
+    @@index([draftStatus])
+    @@index([sentStatus])
+    @@index([spamStatus])
+    @@index([spoofStatus])
+    @@index([lastMessageDate])
+}
+
+model Email {
+    id String @id @default(cuid())
+    threadId String
+    thread Thread @relation(fields: [threadId], references: [id])
+    createdTime DateTime
+    lastModifiedTime DateTime
+    sentAt DateTime
+    receivedAt DateTime
+    internetMessageId String
+    subject String
+    sysLabels String[]
+    keywords String[]
+    sysClassifications String[]
+    sensitivity Sensitivity @default(normal)
+    fromId String
+    from EmailAddress @relation("FromEmail", fields: [fromId], references: [id])
+    to EmailAddress[] @relation("ToEmail")
+    cc EmailAddress[] @relation("CcEmail")
+    bcc EmailAddress[] @relation("BccEmail")
+    replyTo EmailAddress[] @relation("ReplyToEmail")
+    hasAttachments Boolean
+    body String?
+    bodySnippet String?
+    attachments EmailAttachments[]
+    inReplyTo String?
+    references String?
+    threadIndex String?
+    internetHeaders Json[]
+    nativeProperties Json?
+    folderId String?
+    ommited String[]
+
+    emailLabel EmailLabel @default(inbox)
+
+    @@index([threadId])
+    @@index([emailLabel])
+    @@index([sentAt])
+}
+
+
+model EmailAddress {
+    id String @id @default(cuid())
+    name String?
+    address String
+    raw String?
+    sentEmails Email[] @relation("FromEmail")
+    recivedTo Email[] @relation("ToEmail")
+    recivedCc Email[] @relation("CcEmail")
+    recivedBcc Email[] @relation("BccEmail")
+    replyToEmails Email[] @relation("ReplyToEmail")
+
+    accountId String
+    Account Account @relation(fields: [accountId], references: [id])
+
+    @@unique([accountId, address])
+}
+
+model EmailAttachments {
+    id String @id @default(cuid())
+    name String
+    mimeType String
+    size Int
+    inline Boolean
+    contentId String?
+    content String?
+    contentLocation String?
+
+    emailId String
+    Email Email @relation(fields: [emailId], references: [id])
+}
+
+enum EmailLabel {
+    inbox
+    sent 
+    draft
+}
+
+enum Sensitivity {
+    normal
+    private
+    personal 
+    confidential
+}
+
+model Dataset {
+    id String @id @default(cuid())
+    internetMessageId String
+    sentAt DateTime
+    from String
+    to String
+    subject String
+    body String
+    mx_record String?
+    spf_record String?
+    dkim_record_1 String?
+    dkim_record_2 String?
+    dmarc_record String?
 }

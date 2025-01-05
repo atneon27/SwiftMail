@@ -1,6 +1,7 @@
 "use server"
 
 import { auth } from "@clerk/nextjs/server"
+import axios from "axios"
 
 export const getAurinkoAuthUrl = async (serviceType: 'Google' | 'Office365') => {
     const { userId } = await auth()
@@ -24,4 +25,43 @@ export const getAurinkoAuthUrl = async (serviceType: 'Google' | 'Office365') => 
     }
 
     return aurinkoUrl.toString()
+}
+
+export const exchageAurinkoCodeForToken = async (code: string) => {
+    try {
+        const result = await axios({
+            method: 'post',
+            url: `https://api.aurinko.io/v1/auth/token/${code}`,
+            auth: {
+                username: process.env.AURINKO_CLIENT_ID as string,
+                password: process.env.AURINKO_CLIENT_SECRET as string
+            }
+        })
+        
+        return result.data as {
+            accountId: string
+            accessToken: string
+        }
+    } catch(err) {
+        console.log(err)
+    }
+}
+
+export const getAccountDetails = async (accountToken: string) => {
+    try {
+        const result = await axios({
+            method: "get",
+            url: `https://api.aurinko.io/v1/account`,
+            headers: {
+                'Authorization': `Bearer ${accountToken}`
+            }
+        })
+
+        return result.data as {
+            email: string,
+            name: string
+        }
+    } catch(err) {
+        console.log(err)
+    }
 }

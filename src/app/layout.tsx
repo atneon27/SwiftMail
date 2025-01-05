@@ -1,13 +1,13 @@
 import "@/styles/globals.css";
 
-import {
-  ClerkProvider
-} from '@clerk/nextjs'
+import { ClerkProvider } from "@clerk/nextjs";
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
+import { ThemeProvider } from "@/components/theme-provider";
+import KBar from "../components/kbar";
 
 export const metadata: Metadata = {
   title: "SwiftMail",
@@ -20,11 +20,22 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${GeistSans.variable}`}>
-        <body>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
-        </body>
-      </html>
+        <html lang="en" className={`${GeistSans.variable}`} suppressHydrationWarning>
+          <body>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <TRPCReactProvider>
+                <KBar>
+                  {children}
+                </KBar>
+              </TRPCReactProvider>
+            </ThemeProvider>
+          </body>
+        </html>
     </ClerkProvider>
   );
 }
