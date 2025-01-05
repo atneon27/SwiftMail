@@ -4,7 +4,7 @@ import { Letter } from 'react-letter'
 import Avatar from 'react-avatar'
 import { useThreads } from '@/hooks/use-thread'
 import { cn } from '@/lib/utils'
-import { RouterOutputs } from '@/trpc/react'
+import { type RouterOutputs } from '@/trpc/react'
 import React from 'react'
 import { formatDistanceToNow } from 'date-fns'
 

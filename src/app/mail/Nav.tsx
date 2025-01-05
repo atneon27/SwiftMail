@@ -1,12 +1,12 @@
 import { buttonVariants } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { LucideIcon } from 'lucide-react'
+import { type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import React from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 interface Props {
-    isCollapsed: Boolean
+    isCollapsed: boolean
     links: {
         title: string
         label?: string
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const Nav = ({ isCollapsed, links }: Props) => {
-    const [_, setTab] = useLocalStorage('swiftmail-tab', 'inbox')
+    const [tab, setTab] = useLocalStorage('swiftmail-tab', 'inbox')
 
     return (
         <div 

@@ -2,7 +2,7 @@
 
 import ThemeToggle from '@/components/ThemeToggle'
 import dynamic from 'next/dynamic'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 // import { Mail } from './Mail'
 
 const Mail = dynamic(() => import('./Mail').then(mod => mod.Mail), { ssr: false })
@@ -16,7 +16,7 @@ export default function Page() {
     //     }, 120000)
     // }, [isLoading])
 
-    let isLoading = false
+    const isLoading = false
      
     return (
         <div>

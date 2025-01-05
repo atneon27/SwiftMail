@@ -5,7 +5,7 @@ import { useThreads } from '@/hooks/use-thread'
 import React from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
+
 
 const ThreadList = () => {
     const { threads, threadId, setThreadId } = useThreads()

@@ -5,7 +5,7 @@ import { useLocalStorage } from 'usehooks-ts'
 import { api } from '@/trpc/react'
 
 interface Props {
-    isCollapsed: Boolean
+    isCollapsed: boolean
 }
 
 export const Sidebar = ({ isCollapsed }: Props) => {

@@ -1,12 +1,11 @@
 "use client"
 
-import { Action, KBarAnimator, KBarPortal, KBarPositioner, KBarProvider, KBarSearch } from 'kbar'
+import { type Action, KBarAnimator, KBarPortal, KBarPositioner, KBarProvider, KBarSearch } from 'kbar'
 import ShortcutOptions from './ShortcutOptions'
 import { useLocalStorage } from 'usehooks-ts'
 
 export default function KBar({children}: {children: React.ReactNode}) {
-    const [tab, setTab] = useLocalStorage('swiftmail-tab', 'inbox')
-    const [done, setDone] = useLocalStorage('swiftmail-done', false)
+    const [tab, setTab] = useLocalStorage('swiftmail-tab', 'inbox') 
 
     const actions: Action[] = [
         {

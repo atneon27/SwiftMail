@@ -1,7 +1,7 @@
 import { exchageAurinkoCodeForToken, getAccountDetails } from "@/lib/aurinko";
 import { db } from "@/server/db";
 import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import {waitUntil} from '@vercel/functions'
 import axios from "axios";
 
@@ -89,6 +89,7 @@ export const GET = async (req: NextRequest) => {
 
         return NextResponse.redirect(new URL('/mail', process.env.NEXT_PUBLIC_URL))
     } catch(err) {
+        console.log(err)
         return NextResponse.json({
             msg: "Internal Server error"
         }, {

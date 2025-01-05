@@ -1,9 +1,9 @@
 import { db } from "@/server/db";
-import { EmailAddress, EmailAttachment, EmailMessage } from "./types";
+import { type EmailAddress, type EmailAttachment, type EmailMessage } from "./types";
 import logger from "./logging";
 
-function parseModelHeaders(value: String) {
-    let records = value.split(';').map(val => val.trim())
+function parseModelHeaders(value: string) {
+    const records = value.split(';').map(val => val.trim())
     return {
         mx_record: records[0],
         dkimOne: records[1]?.slice(records[1].indexOf('=')+1) ?? "none",
@@ -140,8 +140,8 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                 done: false,
                 participantIds: [...new Set([
                     fromAddress.id,
-                    ...toAddress.map(a => a!.id),
-                    ...ccAddress.map(a => a!.id),
+                    ...toAddress.map(a => a.id),
+                    ...ccAddress.map(a => a.id),
                     ...bccAddress.map(a => a!.id)
                 ])]
             }, 
@@ -156,8 +156,8 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                 lastMessageDate: new Date(email.sentAt),
                 participantIds: [...new Set([
                     fromAddress.id,
-                    ...toAddress.map(a => a!.id),
-                    ...ccAddress.map(a => a!.id),
+                    ...toAddress.map(a => a.id),
+                    ...ccAddress.map(a => a.id),
                     ...bccAddress.map(a => a!.id)
                 ])]
             }
@@ -179,8 +179,8 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                 sysClassifications: email.sysClassifications,
                 sensitivity: email.sensitivity,
                 fromId: fromAddress.id,
-                to: { set: toAddress.map(adr => ({id: adr!.id}))},
-                cc: { set: ccAddress.map(adr => ({id: adr!.id}))},
+                to: { set: toAddress.map(adr => ({id: adr.id}))},
+                cc: { set: ccAddress.map(adr => ({id: adr.id}))},
                 bcc: { set: bccAddress.map(adr => ({id: adr!.id}))},
                 replyTo: {set: replyToAddress.map(adr => ({id: adr!.id}))},
                 hasAttachments: email.hasAttachments === 'true',
@@ -206,8 +206,8 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                 sysClassifications: email.sysClassifications,
                 sensitivity: email.sensitivity,
                 fromId: fromAddress.id,
-                to: { connect: toAddress.map(adr => ({id: adr!.id}))},
-                cc: { connect: ccAddress.map(adr => ({id: adr!.id}))},
+                to: { connect: toAddress.map(adr => ({id: adr.id}))},
+                cc: { connect: ccAddress.map(adr => ({id: adr.id}))},
                 bcc: { connect: bccAddress.map(adr => ({id: adr!.id}))},
                 replyTo: {connect: replyToAddress.map(adr => ({id: adr!.id}))},
                 hasAttachments: email.hasAttachments === 'true',

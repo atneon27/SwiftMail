@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ActionImpl, ActionId } from 'kbar'
+import { type ActionImpl, type ActionId } from 'kbar'
 import React, { useMemo } from 'react'
 
 type Props = {

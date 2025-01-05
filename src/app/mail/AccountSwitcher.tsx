@@ -7,10 +7,10 @@ import { useLocalStorage } from 'usehooks-ts'
 import { cn } from '@/lib/utils'
 import { Plus } from 'lucide-react'
 import { getAurinkoAuthUrl } from '@/lib/aurinko'
-import { SignOutButton, useClerk } from '@clerk/nextjs'
+import { useClerk } from '@clerk/nextjs'
 
 type Props = {
-    isCollapsed: Boolean
+    isCollapsed: boolean
 }
 
 const AccountSwitcher = ({ isCollapsed }: Props) => {
@@ -46,8 +46,8 @@ const AccountSwitcher = ({ isCollapsed }: Props) => {
                         </SelectItem>
                     })}
                     <div>
-                        <button onClick={() => {
-                            signOut()
+                        <button onClick={async() => {
+                            await signOut()
                         }}>
                             Sign Out
                         </button>

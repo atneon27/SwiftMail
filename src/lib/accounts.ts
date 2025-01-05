@@ -1,4 +1,4 @@
-import { EmailMessage, SyncResponse, SyncUpdatedResponse } from "@/lib/types"
+import { type EmailMessage, type SyncResponse, type SyncUpdatedResponse } from "@/lib/types"
 import axios from "axios"
 
 export class Account {
@@ -28,7 +28,7 @@ export class Account {
         deltaToken?: string;
         pageToken?: string
     }) {
-        let params: Record<string, string> = {}
+        const params: Record<string, string> = {}
         if(deltaToken) params.deltaToken = deltaToken
         if(pageToken) params.pageToken = pageToken
 

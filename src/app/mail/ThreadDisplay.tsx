@@ -11,9 +11,8 @@ import {
 import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDate } from 'date-fns'
-import DOMPurify from 'dompurify'
 import DisplayEmail from './DisplayEmail'
-import ReplyBox from './ReplyBox'
+
 
 
 const ThreadDisplay = () => {

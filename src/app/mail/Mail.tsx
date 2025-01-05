@@ -35,7 +35,7 @@ export const Mail = ({ defaultLayout = [15, 35, 50], navCollapsedSize, defaultCo
                         setIsCollapsed(true)
                     }}
                     onResize={() => {
-
+                        console.log("")
                     }}  
                     className={cn(isCollapsed && 'min-w-[50px] transition-all duration-300 ease-in-out')}  
                 >

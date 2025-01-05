@@ -13,7 +13,7 @@ export const getAurinkoAuthUrl = async (serviceType: 'Google' | 'Office365') => 
     const aurinkoUrl = new URL('https://api.aurinko.io/v1/auth/authorize')
 
     const params = new URLSearchParams({
-        clientId: process.env.AURINKO_CLIENT_ID as string,
+        clientId: process.env.AURINKO_CLIENT_ID!,
         serviceType,
         scopes: 'Mail.Read Mail.ReadWrite Mail.Send Mail.Drafts Mail.All',
         responseType: 'code',
@@ -33,8 +33,8 @@ export const exchageAurinkoCodeForToken = async (code: string) => {
             method: 'post',
             url: `https://api.aurinko.io/v1/auth/token/${code}`,
             auth: {
-                username: process.env.AURINKO_CLIENT_ID as string,
-                password: process.env.AURINKO_CLIENT_SECRET as string
+                username: process.env.AURINKO_CLIENT_ID!,
+                password: process.env.AURINKO_CLIENT_SECRET!
             }
         })
         
