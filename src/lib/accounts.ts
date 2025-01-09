@@ -16,7 +16,7 @@ export class Account {
                 'Authorization': `Bearer ${this.token}`
             }, 
             params: {
-                'daysWithin': 10,
+                'daysWithin': 3,
                 'bodyType': 'html'
             }
         })

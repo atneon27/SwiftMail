@@ -1,6 +1,7 @@
 import { db } from "@/server/db";
 import { type EmailAddress, type EmailAttachment, type EmailMessage } from "./types";
 import logger from "./logging";
+import {JSDOM} from 'jsdom'
 
 function parseModelHeaders(value: string) {
     const records = value.split(';').map(val => val.trim())
@@ -11,6 +12,17 @@ function parseModelHeaders(value: string) {
         spf: records[3]?.slice(records[3].indexOf('=')+1) ?? "none",
         dmarc: records[4]?.slice(records[4].indexOf('=')+1) ?? "none"
     }
+}
+
+// to remove
+function containsKeyword(text: string) {
+  const keywords = ['reddit', 'linkedin', 'brevo', 'facebook', 'instagram', 'snapchat']
+  for(let word of keywords) {
+    if(text.includes(word)) {
+        return true
+    }
+  }
+  return false
 }
 
 export async function syncEmailToDatabase(emails: EmailMessage[], accountId: string) {
@@ -124,6 +136,16 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
             return
         }
 
+        // dataset entry part
+        const value = email.internetHeaders.find(val => val.name == 'Authentication-Results')?.value ?? ""
+        const reqHeaders = parseModelHeaders(value)
+
+        // to remove this bit
+        const body = email.body ?? ''
+        const spam = containsKeyword(email.body ?? '')
+        const spoof = value.includes('brevosend.com')
+        // --
+
         const toAddress = email.to.map(addr => addressMap.get(addr.address)).filter((adr): adr is NonNullable<typeof adr> => Boolean(adr));
         const ccAddress = email.cc.map(addr => addressMap.get(addr.address)).filter((adr): adr is NonNullable<typeof adr> => Boolean(adr));
         const bccAddress = email.bcc.map(addr => addressMap.get(addr.address)).filter(Boolean)
@@ -150,9 +172,12 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                 accountId,
                 subject: email.subject,
                 done: false,
-                inboxStatus: emailLabelType === 'inbox',
+                // revert the changes made
+                inboxStatus: (spam || spoof) ? false : emailLabelType === 'inbox',
                 sentStatus: emailLabelType === 'sent',
                 draftStatus: emailLabelType === 'draft',
+                spamStatus: spam,
+                spoofStatus: spoof,
                 lastMessageDate: new Date(email.sentAt),
                 participantIds: [...new Set([
                     fromAddress.id,
@@ -229,8 +254,6 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
             }
         })
         
-        const value = email.internetHeaders.find(val => val.name == 'Authentication-Results')?.value ?? ""
-        const reqHeaders = parseModelHeaders(value)
 
         const dataset = await db.dataset.upsert({
             where: {
@@ -289,9 +312,11 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                 id: thread.id
             }, 
             data: {
-                inboxStatus: threadFolderType === 'inbox',
+                inboxStatus: (spam || spoof) ? false : threadFolderType === 'inbox',
                 sentStatus: threadFolderType === 'sent',
-                draftStatus: threadFolderType === 'draft'
+                draftStatus: threadFolderType === 'draft',
+                spamStatus: spam,
+                spoofStatus: spoof
             }
         })
 

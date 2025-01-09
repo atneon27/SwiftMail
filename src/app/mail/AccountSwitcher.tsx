@@ -5,9 +5,9 @@ import React from 'react'
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '../../components/ui/select'
 import { useLocalStorage } from 'usehooks-ts'
 import { cn } from '@/lib/utils'
-import { Plus } from 'lucide-react'
+import { LogOutIcon, Plus } from 'lucide-react'
 import { getAurinkoAuthUrl } from '@/lib/aurinko'
-import { useClerk } from '@clerk/nextjs'
+import { SignOutButton, useClerk, UserButton } from '@clerk/nextjs'
 
 type Props = {
     isCollapsed: boolean
@@ -45,13 +45,6 @@ const AccountSwitcher = ({ isCollapsed }: Props) => {
                             {acc.emailAddress}
                         </SelectItem>
                     })}
-                    <div>
-                        <button onClick={async() => {
-                            await signOut()
-                        }}>
-                            Sign Out
-                        </button>
-                    </div>
                     <div 
                         onClick={async () => {
                             const aurinkoUrl = await getAurinkoAuthUrl('Google')
@@ -62,6 +55,24 @@ const AccountSwitcher = ({ isCollapsed }: Props) => {
                         <Plus className="size-4 mr-1" />
                         Add another account 
                     </div>
+                    {/* <div 
+                        onClick={async() => {
+                            await signOut()
+                        }}
+                        className='flex relative items-center w-full text-red-500 rounded-sm hover:bg-gray-50 cursor-pointer text-sm py-1.5 pr-2 pl-8 outline-none focus:bg-asccent'
+                    > 
+                        <LogOutIcon className='size-4 mr-1' />
+                        Sign Out
+                    </div> */}
+                    <button
+                        onClick={async() => {
+                            await signOut()
+                        }}
+                        className='flex relative items-center w-full text-red-500 rounded-sm hover:bg-gray-50 cursor-pointer text-sm py-1.5 pr-2 pl-8 outline-none focus:bg-asccent'
+                    >
+                        <LogOutIcon className='size-4 mr-1' />
+                        <SignOutButton />
+                    </button>
                 </SelectContent>
             </SelectTrigger>
         </Select>

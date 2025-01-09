@@ -1,5 +1,5 @@
 import { LinkAccountButton } from "@/components/LinkAccountButton";
-import CountdownTimer from "./CountdownTimer";
+import CountdownTimer from "./mail/CountdownTimer";
 
 export default function Home() {
   return (

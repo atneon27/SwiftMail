@@ -157,4 +157,6 @@ model Dataset {
     dkim_record_1 String?
     dkim_record_2 String?
     dmarc_record String?
+    spam_status Boolean? @default(false)
+    spoof_status Boolean? @default(false)
 }

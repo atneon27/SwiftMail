@@ -3,7 +3,7 @@
 import ThemeToggle from '@/components/ThemeToggle'
 import dynamic from 'next/dynamic'
 import React, { useState,useEffect } from 'react'
-import CountdownTimer from '../CountdownTimer'
+import CountdownTimer from './CountdownTimer'
 import { api } from '@/trpc/react'
 import { useLocalStorage } from 'usehooks-ts'
 // import { Mail } from './Mail'
@@ -11,15 +11,15 @@ import { useLocalStorage } from 'usehooks-ts'
 const Mail = dynamic(() => import('./Mail').then(mod => mod.Mail), { ssr: false })
 
 export default function Page() {
-    const [isLoading, setIsLoading] = useState<boolean>(true)
+    // const [isLoading, setIsLoading] = useState<boolean>(true)
     
-    useEffect(() => {
-        setTimeout(() => {
-            setIsLoading(false)
-        }, 120000)
-    }, [isLoading])
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         setIsLoading(false)
+    //     }, 180000)
+    // }, [isLoading])
 
-    // const isLoading = false
+    const isLoading = false
      
     return (
         <div>

@@ -72,3 +72,12 @@
   border-radius: 4px;
   padding: 0px 2px;
 }
+
+nextjs-portal {
+  display: none;
+}
+
+body {
+  padding: 0 !important; 
+  overflow: auto !important;
+}
