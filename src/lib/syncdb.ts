@@ -17,7 +17,7 @@ function parseModelHeaders(value: string) {
 // to remove
 function containsKeyword(text: string) {
   const keywords = ['reddit', 'linkedin', 'brevo', 'facebook', 'instagram', 'snapchat']
-  for(let word of keywords) {
+  for(const word of keywords) {
     if(text.includes(word)) {
         return true
     }
