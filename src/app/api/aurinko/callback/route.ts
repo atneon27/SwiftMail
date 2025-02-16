@@ -1,14 +1,13 @@
 import { exchageAurinkoCodeForToken, getAccountDetails } from "@/lib/aurinko";
 import { db } from "@/server/db";
 import { auth } from "@clerk/nextjs/server";
-import { type NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {waitUntil} from '@vercel/functions'
 import axios from "axios";
 
 export const GET = async (req: NextRequest) => {
     const { userId } = await auth()
 
-    console.log(!userId)
     if(!userId) {
         return NextResponse.json({
             msg: "Unauthorized!"
@@ -20,7 +19,6 @@ export const GET = async (req: NextRequest) => {
     const params = req.nextUrl.searchParams
     const status = params.get("status")
 
-    console.log(!status)
     if(status != 'success') {
         return NextResponse.json({
             msg: "Request Failed!"
@@ -30,7 +28,6 @@ export const GET = async (req: NextRequest) => {
     }
 
     const code = params.get("code")
-    console.log(!code)
     if(!code) {
         return NextResponse.json({
             msg: "No Code Recived!"
@@ -40,7 +37,6 @@ export const GET = async (req: NextRequest) => {
     }
 
     const tokenData = await exchageAurinkoCodeForToken(code)
-    console.log(!tokenData)
     if(!tokenData) {
         return NextResponse.json({
             msg: "No Token Recived"
@@ -50,7 +46,6 @@ export const GET = async (req: NextRequest) => {
     }
 
     const accountData = await getAccountDetails(tokenData.accessToken)
-    console.log(!accountData)
     if(!accountData) {
         return NextResponse.json({
             msg: "No Account Data Recived",
@@ -77,20 +72,28 @@ export const GET = async (req: NextRequest) => {
             }
         })
 
-        waitUntil(
-            new Promise((resolve, object) => {
-                axios({
-                    method: 'post',
-                    url: `${process.env.NEXT_PUBLIC_URL}/api/initial-sync`,
-                    data: {
-                        accountId: tokenData.accountId.toString(),
-                        userId
-                    }
+        try {
+            waitUntil(
+                new Promise((resolve, object) => {
+                    axios({
+                        method: 'post',
+                        url: `${process.env.NEXT_PUBLIC_URL}/api/initial-sync`,
+                        data: {
+                            accountId: tokenData.accountId.toString(),
+                            userId
+                        }
+                    })
+                    .then(resolve)
+                    .catch(object)
                 })
-                .then(resolve)
-                .catch(object)
+            )
+        } catch(e) {
+            console.log(e)
+            return NextResponse.json({
+                msg: "erorr calling initial sync"
             })
-        )
+        }
+
 
         return NextResponse.redirect(new URL('/mail', process.env.NEXT_PUBLIC_URL))
     } catch(err) {
