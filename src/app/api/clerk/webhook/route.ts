@@ -1,10 +1,8 @@
-import logger from "@/lib/logging";
 import { db } from "@/server/db";
 import { type NextRequest, NextResponse } from "next/server";
 
 export const POST = async(req: NextRequest) => {
     try {
-        logger.debug("clerk callback hit")
         const { data } = await req.json()
         
         const emailAdress = data?.email_addresses[0].email_address
@@ -34,7 +32,6 @@ export const POST = async(req: NextRequest) => {
         
         return NextResponse.redirect(new URL('/dummy', process.env.NEXT_PUBLIC_URL)) 
     } catch(err) {
-        logger.error(err)
         return NextResponse.json({
             msg: "Internal Server Error"
         }, {
