@@ -1,7 +1,5 @@
 import { db } from "@/server/db";
 import { type EmailAddress, type EmailAttachment, type EmailMessage } from "./types";
-import logger from "./logging";
-import {JSDOM} from 'jsdom'
 
 function parseModelHeaders(value: string) {
     const records = value.split(';').map(val => val.trim())
@@ -65,7 +63,6 @@ async function upsertEmailAddress(address: EmailAddress, accountId: string) {
 
         return result
     } catch(err) {
-        logger.error(err)
         return null
     }
 }
@@ -98,7 +95,7 @@ async function upsertAttachments(emailId: string, attachment: EmailAttachment) {
             }
         })
     } catch(err) {
-        logger.error(err)
+        console.log(err)
     }
 }
 
@@ -325,6 +322,6 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
         }
 
     } catch(err) {
-        logger.error(err)
+        console.log(err)
     }
 }
