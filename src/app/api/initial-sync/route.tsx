@@ -54,7 +54,6 @@ export const POST = async (req: NextRequest) => {
 
     await syncEmailToDatabase(response.emails, accountId) 
 
-    console.log("Inital Sync Completed")
     return NextResponse.json({
         msg: "Initial Sync is Complete"
     }, {
