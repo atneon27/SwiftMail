@@ -8,6 +8,7 @@ import axios from "axios";
 export const GET = async (req: NextRequest) => {
     const { userId } = await auth()
 
+    console.log(!userId)
     if(!userId) {
         return NextResponse.json({
             msg: "Unauthorized!"
@@ -19,6 +20,7 @@ export const GET = async (req: NextRequest) => {
     const params = req.nextUrl.searchParams
     const status = params.get("status")
 
+    console.log(!status)
     if(status != 'success') {
         return NextResponse.json({
             msg: "Request Failed!"
@@ -28,6 +30,7 @@ export const GET = async (req: NextRequest) => {
     }
 
     const code = params.get("code")
+    console.log(!code)
     if(!code) {
         return NextResponse.json({
             msg: "No Code Recived!"
@@ -37,6 +40,7 @@ export const GET = async (req: NextRequest) => {
     }
 
     const tokenData = await exchageAurinkoCodeForToken(code)
+    console.log(!tokenData)
     if(!tokenData) {
         return NextResponse.json({
             msg: "No Token Recived"
@@ -45,8 +49,9 @@ export const GET = async (req: NextRequest) => {
         })
     }
 
-    const accoutData = await getAccountDetails(tokenData.accessToken)
-    if(!accoutData) {
+    const accountData = await getAccountDetails(tokenData.accessToken)
+    console.log(!accountData)
+    if(!accountData) {
         return NextResponse.json({
             msg: "No Account Data Recived",
         }, {
@@ -66,8 +71,8 @@ export const GET = async (req: NextRequest) => {
                 id: tokenData.accountId.toString(),
                 userId,
                 accessToken: tokenData.accessToken,
-                emailAddress: accoutData.email,
-                name: accoutData.name,
+                emailAddress: accountData.email,
+                name: accountData.name,
                 nextDeltaToken: ""
             }
         })
@@ -91,7 +96,7 @@ export const GET = async (req: NextRequest) => {
     } catch(err) {
         console.log(err)
         return NextResponse.json({
-            msg: "Internal Server error"
+            msg: "Something Invalid Was passed probably"
         }, {
             status: 500
         })
