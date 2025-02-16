@@ -3,8 +3,14 @@ import { syncEmailToDatabase } from "@/lib/syncdb";
 import { db } from "@/server/db";
 import { type NextRequest, NextResponse } from "next/server";
 
+type Data = {
+    accountId: string
+    userId: string
+}
+
 export const POST = async (req: NextRequest) => {
-    const { accountId, userId } = await req.json()
+    const { accountId, userId }: Data = await req.json()
+    
     if(!accountId || !userId) {
         return NextResponse.json({
             msg: "Invalid Data Recived!"

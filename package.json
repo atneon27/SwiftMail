@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.9.2",
-    "@prisma/client": "^6.0.1",
+    "@prisma/client": "^6.3.1",
     "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.4",
     "@radix-ui/react-select": "^2.1.4",
@@ -84,7 +84,7 @@
     "postcss": "^8.4.39",
     "prettier": "^3.3.2",
     "prettier-plugin-tailwindcss": "^0.6.5",
-    "prisma": "^5.14.0",
+    "prisma": "^6.3.1",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.5.3"
   },
