@@ -12,6 +12,7 @@ import React from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { formatDate } from 'date-fns'
 import DisplayEmail from './DisplayEmail'
+import ReplyBox from './ReplyBox'
 
 
 
@@ -99,7 +100,7 @@ const ThreadDisplay = () => {
                         <Separator />
                         
                         {/* change the height to 100vh - 500px when the reply component is ready */}
-                        <div className='max-h-[calc(100vh-200px)] overflow-scroll flex flex-col'>
+                        <div className='max-h-[calc(100vh-500px)] overflow-scroll flex flex-col'>
                             <div className="p-6 flex flex-col gap-4">
                                 {currThread.emails.map((email) => {
                                     return <DisplayEmail key={email.id} email={email} />
@@ -107,9 +108,9 @@ const ThreadDisplay = () => {
                             </div>
                         </div>
 
-                        {/* <div className="flex-1"></div>
+                        <div className="flex-1"></div>
                         <Separator className='mt-auto' />
-                        <ReplyBox /> */}
+                        <ReplyBox />
                     </div>
                 </>)
                 : (<div className='p-8 text-muted-foreground text-center'>

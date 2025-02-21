@@ -11,18 +11,18 @@ import { useLocalStorage } from 'usehooks-ts'
 const Mail = dynamic(() => import('./Mail').then(mod => mod.Mail), { ssr: false })
 
 export default function Page() {
-    const [isLoading, setIsLoading] = useState<boolean>(true)
+    // const [isLoading, setIsLoading] = useState<boolean>(true)
     
-    useEffect(() => {
-        setTimeout(() => {
-            setIsLoading(false)
-        }, 120000)
-    }, [isLoading])
+    // useEffect(() => {
+    //     setTimeout(() => {
+    //         setIsLoading(false)
+    //     }, 120000)
+    // }, [isLoading])
 
-    // const isLoading = false
+    const isLoading = false
      
     return (
-        <div>
+        <div className='relative'>
             {isLoading 
                 ? (<div className='flex justify-center items-center h-screen text-muted-foreground gap-2'>
                     <div>Syncying Mails</div>

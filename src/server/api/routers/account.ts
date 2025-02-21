@@ -1,6 +1,7 @@
 import { db } from "@/server/db";
 import { createTRPCRouter, privateProcedure } from "../trpc";
 import { z } from 'zod'
+import { error } from "console";
 
 const hasAccess = async (accountId: string, userId: string) => {
     const account = await db.account.findFirst({
@@ -91,5 +92,61 @@ export const accountRouter = createTRPCRouter({
         })
 
         return data
+    }),
+    getSuggestions: privateProcedure.input(z.object({
+        accountId: z.string()
+    })).query(async ({ctx, input}) => {
+        const account = await hasAccess(input.accountId, ctx.auth.userId)
+        const data = await ctx.db.emailAddress.findMany({
+            where: {
+                accountId: account.id
+            },
+            select: {
+                address: true,
+                name: true
+            }
+        })
+
+        return data
+    }),
+    getReplyDetails: privateProcedure.input(z.object({
+        accountId: z.string(),
+        threadId: z.string()
+    })).query(async ({ctx, input}) => {
+        const account = await hasAccess(input.accountId, ctx.auth.userId)
+        const thread = await ctx.db.thread.findFirst({
+            where: {
+                id: input.threadId,
+            }, 
+            include: {
+                emails: {
+                    orderBy: {sentAt: 'asc'},
+                    select: {
+                        from: true,
+                        to: true,
+                        cc: true,
+                        bcc: true,
+                        sentAt: true,
+                        subject: true,
+                        internetMessageId: true
+                    }
+                }
+            }
+        })
+
+        if(!thread || thread.emails.length == 0) throw new Error('No Thread Found')
+        
+        const lastExternalEmail = thread.emails.reverse().find(email => email.from.address != account.emailAddress);
+
+        if(!lastExternalEmail) throw new Error('Thread Not Found')
+
+        return {
+            subject: lastExternalEmail.subject,
+            to: [lastExternalEmail.from, ...lastExternalEmail.to.filter(to => to.address != account.emailAddress)],
+            cc: lastExternalEmail.cc.filter(cc => cc.address != account.emailAddress),
+            // bcc: lastExternalEmail.bcc.filter(bcc => bcc.address != account.emailAddress)
+            from: { name: account.name, address: account.emailAddress },
+            id: lastExternalEmail.internetMessageId
+        }
     })
 })
