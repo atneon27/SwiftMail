@@ -1,11 +1,15 @@
-import { type EmailMessage, type SyncResponse, type SyncUpdatedResponse } from "@/lib/types"
+import { EmailAddress, type EmailMessage, type SyncResponse, type SyncUpdatedResponse } from "@/lib/types"
+import { db } from "@/server/db"
 import axios from "axios"
+import { syncEmailToDatabase } from "./syncdb"
 
 export class Account {
     private token: string
+    private id: string
 
-    constructor(token: string) {
+    constructor(accountId: string, token: string) {
         this.token = token
+        this.id = accountId
     }
 
     private async startSync() {
@@ -24,23 +28,26 @@ export class Account {
         return response.data
     }
 
-    private async getUpdatedEmails({deltaToken, pageToken}: {
+    async getUpdatedEmails({deltaToken, pageToken}: {
         deltaToken?: string;
         pageToken?: string
     }) {
-        const params: Record<string, string> = {}
-        if(deltaToken) params.deltaToken = deltaToken
-        if(pageToken) params.pageToken = pageToken
+        if(!this.token) throw new Error("Invalid Access Token")
 
-        const response = await axios<SyncUpdatedResponse>({
-            method: 'get',
-            url: 'https://api.aurinko.io/v1/email/sync/updated',
+        const reqParams: Record<string, string> = {}
+        if(deltaToken) reqParams.deltaToken = deltaToken ?? '';
+        if(pageToken) reqParams.pageToken = pageToken ?? '';
+
+        const config = {
+            params: reqParams,
             headers: {
-                'Authorization': `Bearer ${this.token}`
-            },
-            params
-        })
-
+                Authorization: `Bearer ${this.token}`
+            }
+        }
+        
+        const response = await axios.get<SyncUpdatedResponse>(
+            'https://api.aurinko.io/v1/email/sync/updated', config
+        )
         return response.data
     }
 
@@ -78,4 +85,110 @@ export class Account {
             console.log(err)
         }
     }
+
+    async syncEmails() {
+        const acc = await db.account.findUnique({
+            where: {
+                id: this.id,
+                accessToken: this.token
+            }
+        })
+
+        if(!acc) throw new Error("Account not found!")
+        if(!acc.nextDeltaToken) throw new Error("Account not ready for syncing")
+
+        let response = await this.getUpdatedEmails({
+            deltaToken: acc.nextDeltaToken
+        })
+
+        let storedDeltaToken = acc.nextDeltaToken
+
+        if(response.nextDeltaToken) {
+            storedDeltaToken = response.nextDeltaToken
+        }
+
+        let allEmails: EmailMessage[] = response.records
+
+        while(response.nextPageToken) {
+            response = await this.getUpdatedEmails({
+                pageToken: response.nextPageToken
+            })
+
+            allEmails = allEmails.concat(response.records)
+            if(response.nextDeltaToken) {
+                storedDeltaToken = response.nextDeltaToken
+            }
+        }
+
+        try {
+            await syncEmailToDatabase(allEmails, acc.id)
+        } catch(error) {
+            console.error("An Error occured, ", error)
+        }
+
+        await db.account.update({
+            where: {
+                id: acc.id
+            }, 
+            data: {
+                nextDeltaToken: storedDeltaToken
+            }
+        })
+
+        return {
+            emails: allEmails,
+            deltaToken: storedDeltaToken
+        }
+    }
+
+    async sendEmail({
+        from,
+        subject,
+        body,
+        inReplyTo,
+        threadId,
+        reffrences,
+        to,
+        cc,
+        bcc,
+        replyTo
+    }: {
+        from: EmailAddress,
+        subject: string,
+        body: string,
+        inReplyTo?: string,
+        threadId?: string,
+        reffrences?: string,
+        to: EmailAddress[],
+        cc?: EmailAddress[] 
+        bcc?: EmailAddress[],
+        replyTo: EmailAddress
+    }) {
+        try {
+            const response = await axios.post('https://api.aurinko.io/v1/email/messages', {
+                from,
+                subject,
+                body,
+                inReplyTo,
+                threadId,
+                reffrences,
+                to,
+                cc,
+                bcc,
+                replyTo: [replyTo]
+            }, {
+                params: {
+                    returnIds: true
+                },
+                headers: {
+                    Authorization: `Bearer ${this.token}`
+                }
+            })
+
+            console.log('email sent', response.data)
+        } catch(e) {
+            console.log("Error Sending Email")
+            throw e
+        }
+    }   
 }

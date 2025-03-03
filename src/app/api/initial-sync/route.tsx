@@ -32,7 +32,7 @@ export const POST = async (req: NextRequest) => {
         })
     }
 
-    const account = new Account(dbAccount.accessToken)
+    const account = new Account(accountId, dbAccount.accessToken)
     const response = await account.performInitialSync()
 
     if(!response) {

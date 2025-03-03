@@ -5,6 +5,7 @@ import { useThreads } from '@/hooks/use-thread'
 import React from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
 import { cn } from '@/lib/utils'
+import { Badge } from 'lucide-react'
 
 
 const ThreadList = () => {
@@ -59,7 +60,7 @@ const ThreadList = () => {
                                         })
                                     }}    
                                 >
-                                </div>
+                                </div>  
                                 {/* {thread.emails[0]?.sysLabels.length && (
                                     <div className='flex items-center gap-2'>
                                         {thread.emails[0].sysLabels.map(label => {

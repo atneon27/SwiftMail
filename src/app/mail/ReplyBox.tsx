@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import EmailEditor from './EmailEditor'
 import { api, RouterOutputs } from '@/trpc/react'
 import { useThreads } from '@/hooks/use-thread'
+import { toast } from 'sonner'
 
 const Component = ({ replyDetails }: { replyDetails: NonNullable<RouterOutputs['account']['getReplyDetails']>}) => {
     const { threadId, accountId } = useThreads()
@@ -24,8 +25,29 @@ const Component = ({ replyDetails }: { replyDetails: NonNullable<RouterOutputs['
 
     }, [threadId, accountId])
 
+    const sendEmail = api.account.sendEmail.useMutation()
+
     const handelSend = async (value: string) => {
-        console.log(value)
+        if(!replyDetails) return
+        sendEmail.mutate({
+            accountId,
+            threadId: threadId ?? undefined,
+            body: value,
+            subject,
+            from: replyDetails.from,
+            to: replyDetails.to.map(to => ({ address: to.address, name: to.name ?? ""})),
+            cc: replyDetails.to.map(cc => ({ address: cc.address, name: cc.name ?? ""})),
+            replyTo: replyDetails.from,
+            inReplyTo: replyDetails.id
+        }, {
+            onSuccess: () => {
+                toast.success("Email Sent!")
+            },
+            onError: (error) => {
+                console.log(error)
+                toast.success("Error Sending Email")
+            }
+        })
     }
 
     return (
@@ -38,7 +60,7 @@ const Component = ({ replyDetails }: { replyDetails: NonNullable<RouterOutputs['
             setCcValues={setCcValues}
             to={replyDetails.to.map(to => to.address)}
             handleSend={handelSend}
-            isSending={false}
+            isSending={sendEmail.isPending}
             defaultToolbarExpanded={false}
         />
     )

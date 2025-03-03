@@ -98,8 +98,7 @@ const ThreadDisplay = () => {
                         </div>
 
                         <Separator />
-                        
-                        {/* change the height to 100vh - 500px when the reply component is ready */}
+ 
                         <div className='max-h-[calc(100vh-500px)] overflow-scroll flex flex-col'>
                             <div className="p-6 flex flex-col gap-4">
                                 {currThread.emails.map((email) => {
@@ -110,6 +109,7 @@ const ThreadDisplay = () => {
 
                         <div className="flex-1"></div>
                         <Separator className='mt-auto' />
+                        
                         <ReplyBox />
                     </div>
                 </>)

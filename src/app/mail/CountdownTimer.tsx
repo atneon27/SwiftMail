@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 
 const CountdownTimer = () => {
-  const [timeLeft, setTimeLeft] = useState(120); // 2 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(30);
 
   useEffect(() => {
     if (timeLeft <= 0) return; // Stop the timer when it reaches 0

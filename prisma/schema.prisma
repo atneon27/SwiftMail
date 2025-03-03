@@ -22,7 +22,7 @@ model User {
 model Account {
     id           String @id @default(cuid())
     userId       String
-    accessToken  String
+    accessToken  String @unique
     emailAddress String
     name         String
 

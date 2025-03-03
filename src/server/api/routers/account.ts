@@ -1,7 +1,8 @@
 import { db } from "@/server/db";
 import { createTRPCRouter, privateProcedure } from "../trpc";
 import { z } from 'zod'
-import { error } from "console";
+import { emailAddressSchema } from "@/lib/types";
+import { Account } from "@/lib/accounts";
 
 const hasAccess = async (accountId: string, userId: string) => {
     const account = await db.account.findFirst({
@@ -39,6 +40,7 @@ export const accountRouter = createTRPCRouter({
         tab: z.string()
     })).query(async ({ctx, input}) => {
         const account = await hasAccess(input.accountId, ctx.auth.userId)
+        
         const data =  await ctx.db.thread.count({
             where: {
                 accountId: input.accountId,
@@ -49,7 +51,7 @@ export const accountRouter = createTRPCRouter({
                 spoofStatus: input.tab === 'spoof' ? true : false
             }
         })
-
+        
         return data
     }),
     getThreads: privateProcedure.input(z.object({
@@ -58,6 +60,10 @@ export const accountRouter = createTRPCRouter({
         done: z.boolean()
     })).query(async ({ctx, input}) => { 
         const account = await hasAccess(input.accountId, ctx.auth.userId);
+        const acc = new Account(input.accountId, account.accessToken)
+    
+        await acc.syncEmails().catch(console.error)
+        
         const data = await ctx.db.thread.findMany({
             where: {
                 accountId: input.accountId,
@@ -148,5 +154,32 @@ export const accountRouter = createTRPCRouter({
             from: { name: account.name, address: account.emailAddress },
             id: lastExternalEmail.internetMessageId
         }
+    }),
+    sendEmail: privateProcedure.input(z.object({
+        accountId: z.string(),
+        body: z.string(),
+        subject: z.string(),
+        from: emailAddressSchema,
+        cc: z.array(emailAddressSchema).optional(),
+        bcc: z.array(emailAddressSchema).optional(),
+        to: z.array(emailAddressSchema),
+        replyTo: emailAddressSchema,
+        inReplyTo: z.string().optional(),
+        threadId: z.string().optional()
+    })).mutation(async ({ctx, input}) => {
+        const account = await hasAccess(input.accountId, ctx.auth.userId)
+        const acc = new Account(input.accountId, account.accessToken)
+
+        await acc.sendEmail({
+            from: input.from,
+            body: input.body,
+            subject: input.subject,
+            to: input.to,
+            cc: input.cc,
+            bcc: input.bcc,
+            replyTo: input.replyTo,
+            inReplyTo: input.inReplyTo,
+            threadId: input.threadId
+        })
     })
 })

@@ -14,7 +14,6 @@ export const emailAddressSchema = z.object({
 export interface SyncUpdatedResponse {
     nextPageToken: string;
     nextDeltaToken: string;
-    length: number;
     records: EmailMessage[];
 }
 

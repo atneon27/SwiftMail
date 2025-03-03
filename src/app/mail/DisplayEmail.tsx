@@ -16,10 +16,11 @@ const DisplayEmail = ({ email }: Props) => {
     const { account } = useThreads()
 
     const isMe = account?.emailAddress === email.from.address
+
     return (
         <div className={
             cn('border rounded-md p-4 transition-all hover:translate-x-2', {
-                'border-1-gray-900 border-1-4': isMe
+                'border-l-gray-700 dark:border-l-white border-l-4': isMe
             })
         }>
             <div className='flex items-center justify-between gap-2'>
@@ -38,7 +39,7 @@ const DisplayEmail = ({ email }: Props) => {
 
             <div className='h-4'></div>
 
-            <Letter html={email.body ?? ''} className='bg-white rounded-md text-black'/>
+            <Letter html={email.body ?? ''} className='bg-white dark:bg-black dark:text-white rounded-md text-black'/>
         </div>
     )
 }
