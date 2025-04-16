@@ -3,6 +3,7 @@ import { createTRPCRouter, privateProcedure } from "../trpc";
 import { z } from 'zod'
 import { emailAddressSchema } from "@/lib/types";
 import { Account } from "@/lib/accounts";
+import { OramaClient } from "@/lib/orama";
 
 const hasAccess = async (accountId: string, userId: string) => {
     const account = await db.account.findFirst({
@@ -91,7 +92,7 @@ export const accountRouter = createTRPCRouter({
                     }
                 }
             },
-            take: 25,
+            take: 40,
             orderBy: {
                 lastMessageDate: 'desc'
             }
@@ -180,6 +181,57 @@ export const accountRouter = createTRPCRouter({
             replyTo: input.replyTo,
             inReplyTo: input.inReplyTo,
             threadId: input.threadId
+        })
+    }),
+    unlinkAccount: privateProcedure.input(z.object({
+        accountId: z.string()
+    })).mutation(async ({ctx, input}) => {
+        const account = await hasAccess(input.accountId, ctx.auth.userId)
+
+        const threads = await ctx.db.thread.findMany({
+            where: {
+                accountId: account.id
+            }
+        })
+
+        const threadIds = threads.map(thread => thread.id)
+        await ctx.db.email.deleteMany({
+            where: {
+                threadId: {
+                    in: threadIds
+                }
+            }
+        })
+
+        await ctx.db.emailAddress.deleteMany({
+            where: {
+                accountId: account.id
+            }
+        })
+
+        await ctx.db.thread.deleteMany({
+            where: {
+                accountId: account.id
+            }
+        })
+
+        await ctx.db.account.delete({
+            where: {
+                id: input.accountId,
+                userId: ctx.auth.userId
+            }
+        })
+    }),
+    searchEmails: privateProcedure.input(z.object({
+        accountId: z.string(),
+        query: z.string()
+    })).mutation(async ({ctx, input}) => {
+        const account = await hasAccess(input.accountId, ctx.auth.userId)
+        const orama = new OramaClient(account.id)
+        await orama.initialize()
+
+        return await orama.search({
+            term: input.query
         })
     })
 })

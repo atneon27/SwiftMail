@@ -30,7 +30,12 @@ export const POST = async(req: NextRequest) => {
             })
         }
         
-        return NextResponse.redirect(new URL('/dummy', process.env.NEXT_PUBLIC_URL)) 
+        return NextResponse.json({
+            msg: "Success",
+            redirectTo: "/mail"
+        }, {
+            status: 307
+        })
     } catch(err) {
         return NextResponse.json({
             msg: "Internal Server Error"

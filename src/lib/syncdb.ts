@@ -1,34 +1,43 @@
 import { db } from "@/server/db";
 import { type EmailAddress, type EmailAttachment, type EmailMessage } from "./types";
 import pLimit from 'p-limit'
+import { OramaClient } from "./orama";
+import { turndown } from "./turndown";
 
-function parseModelHeaders(value: string) {
-    const records = value.split(';').map(val => val.trim())
-    return {
-        mx_record: records[0],
-        dkimOne: records[1]?.slice(records[1].indexOf('=')+1) ?? "none",
-        dkimTwo: records[2]?.slice(records[2].indexOf('=')+1) ?? "none",
-        spf: records[3]?.slice(records[3].indexOf('=')+1) ?? "none",
-        dmarc: records[4]?.slice(records[4].indexOf('=')+1) ?? "none"
-    }
-}
 
-// to remove
-function containsKeyword(text: string) {
-  const keywords = ['reddit', 'linkedin', 'brevo', 'facebook', 'instagram', 'snapchat']
-  for(const word of keywords) {
-    if(text.includes(word)) {
-        return true
-    }
-  }
-  return false
+type SpamResponse = {
+    result?: string;
+    score?: number;
+    is_spam?: boolean;
+    text?: string;
 }
 
 export async function syncEmailToDatabase(emails: EmailMessage[], accountId: string) {
     console.log("attempting to sync emails: ", emails.length)
     const limit = pLimit(40)
-
+    
     try {
+        const orama = new OramaClient(accountId)
+        await orama.initialize()
+
+        await Promise.all(emails.map(email => {
+            limit(async() => {
+                const strippedBody = turndown.turndown(email.body ?? '')
+                
+                await orama.insert({
+                    subject: email.subject,
+                    body: strippedBody,
+                    rawBody: email.bodySnippet,
+                    from: email.from.address,
+                    to: email.to.map(to => to.address),
+                    sentAt: email.sentAt.toLocaleString(), 
+                    threadId: email.threadId
+                })
+
+                console.log("Added the email to orama")
+            })    
+        }))
+        
         const result = await Promise.all(
             emails.map((email, idx) => {
                 limit(() => upsertEmail(email, idx, accountId))
@@ -113,7 +122,8 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
         } else if(email.sysLabels.includes('draft')) {
             emailLabelType = 'draft'
         }
-        
+    
+
         const addressesToUpsert = new Map()
         for(const mail of [email.from, ...email.cc, ...email.bcc, ...email.replyTo]) {
             addressesToUpsert.set(mail.address, mail)
@@ -137,23 +147,28 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
             console.log("failed to upsert from address for email ", email.bodySnippet)
             return
         }
-        
-        // dataset entry part
-        const value = email.internetHeaders.find(val => val.name == 'Authentication-Results')?.value ?? ""
-        const reqHeaders = parseModelHeaders(value)
-        
-        // to remove this bit
-        // const body = email.body ?? ''
-        // const spam = containsKeyword(email.body ?? '')
-        // const spoof = value.includes('brevosend.com')
-        // --
+
+        // spam model
+        let response = await fetch("https://api.apilayer.com/spamchecker?threshold=2.51", { 
+            method: "POST",
+            body: email.body ?? '',
+            headers: {
+                "Accept": "*/*",
+                "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+                "apikey": process.env.APILAYER_API_KEY as string,
+                "Content-Type": "text/plain"
+            }
+        });
+    
+        const data = await response.json() as SpamResponse;
+        const currSpamStatus = data.is_spam ?? false
         
         const toAddress = email.to.map(addr => addressMap.get(addr.address)).filter((adr): adr is NonNullable<typeof adr> => Boolean(adr));
         const ccAddress = email.cc.map(addr => addressMap.get(addr.address)).filter((adr): adr is NonNullable<typeof adr> => Boolean(adr));
         const bccAddress = email.bcc.map(addr => addressMap.get(addr.address)).filter(Boolean)
         const replyToAddress = email.replyTo.map(addr => addressMap.get(addr.address)).filter(Boolean)
         
-        const [thread, emailRecord, dataset] = await db.$transaction([
+        const [thread, emailRecord] = await db.$transaction([
             // Threads upsert
             db.thread.upsert({
                 where: {
@@ -161,7 +176,7 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                 }, 
                 update: {
                     accountId: accountId,
-                    subject: email.subject,
+                    subject: email.subject ?? '',
                     lastMessageDate: new Date(email.sentAt),
                     done: false,
                     participantIds: [...new Set([
@@ -174,7 +189,7 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                 create: {
                     id: email.threadId,
                     accountId,
-                    subject: email.subject,
+                    subject: email.subject ?? '',
                     done: false,
                     // revert the changes made
                     inboxStatus:  emailLabelType === 'inbox',
@@ -202,7 +217,7 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                     sentAt: new Date(email.sentAt),
                     receivedAt: new Date(email.receivedAt),
                     internetMessageId: email.internetMessageId,
-                    subject: email.subject,
+                    subject: email.subject ?? '',
                     keywords: email.keywords,
                     sysClassifications: email.sysClassifications,
                     sensitivity: email.sensitivity,
@@ -229,7 +244,7 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                     sentAt: new Date(email.sentAt),
                     receivedAt: new Date(),
                     internetMessageId: email.internetMessageId,
-                    subject: email.subject,
+                    subject: email.subject ?? '',
                     keywords: email.keywords,
                     sysClassifications: email.sysClassifications,
                     sensitivity: email.sensitivity,
@@ -248,40 +263,6 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                     nativeProperties: email.nativeProperties as any,
                     folderId: email.folderId,
                     ommited: email.omitted
-                }
-            }),
-            
-            // Dataset Upsert
-            db.dataset.upsert({
-                where: {
-                    id: email.id
-                }, 
-                update: {
-                    internetMessageId: email.internetMessageId,
-                    sentAt: new Date(email.sentAt),
-                    from: email.from.name ?? '',
-                    to: email.to.map(t => t.address).join(", "),
-                    subject: email.subject,
-                    body: email.body ?? '',
-                    mx_record: reqHeaders.mx_record,
-                    dkim_record_1: reqHeaders.dkimOne,
-                    dkim_record_2: reqHeaders.dkimTwo,
-                    spf_record: reqHeaders.spf,
-                    dmarc_record: reqHeaders.dmarc
-                }, 
-                create: {
-                    id: email.id,
-                    internetMessageId: email.internetMessageId,
-                    sentAt: new Date(email.sentAt),
-                    from: email.from.name ?? '',
-                    to: email.to.map(t => t.address).join(", "),
-                    subject: email.subject,
-                    body: email.body ?? '',
-                    mx_record: reqHeaders.mx_record,
-                    dkim_record_1: reqHeaders.dkimOne,
-                    dkim_record_2: reqHeaders.dkimTwo,
-                    spf_record: reqHeaders.spf,
-                    dmarc_record: reqHeaders.dmarc
                 }
             })
         ])
@@ -316,9 +297,10 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                 id: thread.id
             }, 
             data: {
-                inboxStatus: threadFolderType === 'inbox',
+                inboxStatus: threadFolderType === 'inbox' && !currSpamStatus,
                 sentStatus: threadFolderType === 'sent',
                 draftStatus: threadFolderType === 'draft',
+                spamStatus: currSpamStatus,
             }
         })
         

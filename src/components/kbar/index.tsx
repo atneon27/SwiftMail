@@ -18,6 +18,16 @@ export default function KBar({children}: {children: React.ReactNode}) {
                 setTab('inbox')
             }
         }, {
+            id: 'spamAction',
+            name: 'Spam',
+            shortcut: ['g', 's'],
+            section: 'Navigation',
+            subtitle: 'View Spam',
+            perform: () => {
+                setTab('spam')
+            }
+        },
+        {
             id: 'draftAction',
             name: 'Draft',
             shortcut: ['g', 'd'],
@@ -29,32 +39,13 @@ export default function KBar({children}: {children: React.ReactNode}) {
         }, {
             id: 'sentAction',
             name: 'Sent',
-            shortcut: ['g', 's'],
+            shortcut: ['g', 'g'],
             section: 'Navigation',
             subtitle: 'View Sent',
             perform: () => {
                 setTab('sent')
             }
-        }, 
-        // {
-        //     id: 'pendingAction',
-        //     name: 'See Pending',
-        //     shortcut: ['g','p'],
-        //     section: 'Navigation',
-        //     subtitle: 'See Unseen Mails',
-        //     perform: () => {
-
-        //     }
-        // }, {
-        //     id: 'doneAction',
-        //     name: 'See Done',
-        //     shortcut: ['g','s'],
-        //     section: 'Navigation',
-        //     subtitle: 'See Seen Mails',
-        //     perform: () => {
-                
-        //     }
-        // }
+        },
     ]
 
     return <KBarProvider actions={actions}>

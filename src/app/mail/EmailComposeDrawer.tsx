@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState } from 'react'
 import {
   Drawer,
@@ -13,7 +15,11 @@ import { api } from '@/trpc/react'
 import { toast } from 'sonner'
 import { useThreads } from '@/hooks/use-thread'
 
-const EmailComposeDrawer = () => {
+type Props = {
+    isCollapsed: boolean
+}
+
+const EmailComposeDrawer = ({ isCollapsed }: Props) => {
     const { account } = useThreads()
     const [subject, setSubject] = useState<string>("")
     const [toValues, setToValues] = useState<{ label: string, value: string }[]>([])
@@ -46,10 +52,15 @@ const EmailComposeDrawer = () => {
     return (
         <Drawer>
             <DrawerTrigger>
-                <Button >
+                {!isCollapsed ? (<Button >
                     <Pencil className='size-4 mr-1' />
                     Compose
-                </Button>
+                </Button>) : (
+                    <div className='flex items-center p-2 border bg-black text-white dark:bg-white dark:text-black dark:border-slate-800 border-slate-200 rounded-md'>
+                        <Pencil className='size-4 mr-1' />
+                    </div>
+                )}
+                
             </DrawerTrigger>
                 <DrawerContent>
                     <DrawerHeader>

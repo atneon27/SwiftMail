@@ -16,6 +16,7 @@ const DisplayEmail = ({ email }: Props) => {
     const { account } = useThreads()
 
     const isMe = account?.emailAddress === email.from.address
+    const mailContent = email.body ? email.body : email.bodySnippet
 
     return (
         <div className={
@@ -39,7 +40,7 @@ const DisplayEmail = ({ email }: Props) => {
 
             <div className='h-4'></div>
 
-            <Letter html={email.body ?? ''} className='bg-white dark:bg-black dark:text-white rounded-md text-black'/>
+            <Letter html={mailContent ?? ''} className='bg-white dark:bg-black dark:text-white rounded-md text-black'/>
         </div>
     )
 }

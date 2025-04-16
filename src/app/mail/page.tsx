@@ -1,53 +1,25 @@
-"use client"
+import React from 'react'
+import { cookies } from 'next/headers'
+import { Mail } from './Mail'
 
-import ThemeToggle from '@/components/ThemeToggle'
-import dynamic from 'next/dynamic'
-import React, { useState,useEffect } from 'react'
-import CountdownTimer from './CountdownTimer'
-import { api } from '@/trpc/react'
-import { useLocalStorage } from 'usehooks-ts'
-import { UserButton } from '@clerk/nextjs'
-import { Button } from '@/components/ui/button'
-import EmailComposeDrawer from './EmailComposeDrawer'
-// import { Mail } from './Mail'
+export default async function Page() {
+    const cookieStore = await cookies()
 
-const Mail = dynamic(() => import('./Mail').then(mod => mod.Mail), { ssr: false })
+    const layout = cookieStore.get("react-resizable-panels:layout:mail")
+    const collapsed = cookieStore.get("react-resizable-panels:collapsed")
 
-export default function Page() {
-    const [isLoading, setIsLoading] = useState<boolean>(true)
-    
-    useEffect(() => {
-        setTimeout(() => {
-            setIsLoading(false)
-        }, 30000)
-    }, [isLoading])
-
-    // const isLoading = false
+    const defaultLayout = layout ? JSON.parse(layout.value) : undefined
+    const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined
      
     return (
         <div className='relative'>
-            {isLoading 
-                ? (<div className='flex justify-center items-center h-screen text-muted-foreground gap-2'>
-                    <div>Syncying Mails</div>
-                    <CountdownTimer />
-                </div>) 
-                : (
-                    <>
-                        <div className="absolute bottom-4 left-4">
-                            <div className="flex items-center gap-2">
-                                <UserButton />
-                                <ThemeToggle />    
-                                <EmailComposeDrawer />
-                            </div>
-                        </div>    
-                        <Mail
-                            defaultLayout={[10,38,52]}
-                            navCollapsedSize={4}
-                            defaultCollapsed={true}
-                        />
-                    </>
-                )
-            }
+            <>   
+                <Mail
+                    defaultLayout={defaultLayout}
+                    navCollapsedSize={4}
+                    defaultCollapsed={defaultCollapsed}
+                />
+            </>
         </div>
-    )
+    ) 
 }

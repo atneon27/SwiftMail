@@ -3,6 +3,7 @@ import { Nav } from './Nav'
 import { File, Inbox, MailQuestion, MailWarning, Send } from 'lucide-react'
 import { useLocalStorage } from 'usehooks-ts'
 import { api } from '@/trpc/react'
+import BottomControl from './BottomControl'
 
 interface Props {
     isCollapsed: boolean
@@ -40,12 +41,17 @@ export const Sidebar = ({ isCollapsed }: Props) => {
     return (
         <div>
            <Nav
-                isCollapsed={false}
+                isCollapsed={isCollapsed}
                 links={[{
                     title: 'Inbox',
                     label: inboxThread?.toString() ?? '0',
                     icon: Inbox,
                     variant: tab === 'inbox' ? 'default' : 'ghost'
+                }, {
+                    title: 'Spam', 
+                    label: spamThread?.toString() ?? '0',
+                    icon: MailQuestion,
+                    variant: tab === 'spam' ? 'default' : 'ghost'
                 }, {
                     title: 'Draft',
                     label: draftThread?.toString() ?? '0',
@@ -56,18 +62,12 @@ export const Sidebar = ({ isCollapsed }: Props) => {
                     label: sentThread?.toString() ?? '0',
                     icon: Send,
                     variant: tab === 'sent' ? 'default' : 'ghost'
-                }, {
-                    title: 'Spam', 
-                    label: spamThread?.toString() ?? '0',
-                    icon: MailQuestion,
-                    variant: tab === 'spam' ? 'default' : 'ghost'
-                }, {
-                    title: 'Spoof', 
-                    label: spoofThread?.toString() ?? '0',
-                    icon: MailWarning,
-                    variant: tab === 'spoof' ? 'default' : 'ghost'
-                }]}
+                }
+            ]}
            />
+           <div className="absolute bottom-4 left-4">
+                <BottomControl isCollapsed={isCollapsed} />
+            </div> 
         </div>
     )
 }

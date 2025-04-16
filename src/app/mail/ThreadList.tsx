@@ -5,8 +5,6 @@ import { useThreads } from '@/hooks/use-thread'
 import React from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
 import { cn } from '@/lib/utils'
-import { Badge } from 'lucide-react'
-
 
 const ThreadList = () => {
     const { threads, threadId, setThreadId } = useThreads()
@@ -19,9 +17,11 @@ const ThreadList = () => {
         return acc
     }, {} as Record<string, typeof threads>)
 
+    console.log(groupedThreads)
+
     return (
-        <div className='max-w-full overflow-y-scroll max-h-[calc(100vh-120px)]'>
-            <div className='flex flex-col gap-2 p-4 pt-0'>
+        <div className='max-w-full overflow-y-scroll max-h-[calc(100vh-130px)]'>
+            {threads ? (<div className='flex flex-col gap-2 p-4 pt-0'>
                 {Object.entries(groupedThreads ?? {}).map(([date, threads]) => {
                     return <React.Fragment key={date}>
                         <div className='text-xs font-medium text-muted-foreground mt-5 first:mt-0'>
@@ -41,7 +41,7 @@ const ThreadList = () => {
                                     <div className='flex items-center'>
                                         <div className='flex items-center gap-2'>
                                             <div className='font-semibold'>
-                                                {thread.emails.at(-1)?.from.name}
+                                                {thread.emails.at(-1)?.from.name ? thread.emails.at(-1)?.from.name : thread.subject}
                                             </div>
                                         </div>
                                         <div className='ml-auto text-xs'>
@@ -61,20 +61,13 @@ const ThreadList = () => {
                                     }}    
                                 >
                                 </div>  
-                                {/* {thread.emails[0]?.sysLabels.length && (
-                                    <div className='flex items-center gap-2'>
-                                        {thread.emails[0].sysLabels.map(label => {
-                                            return <Badge className='text-xs font-medium'>
-                                                {label}
-                                            </Badge>
-                                        })}
-                                    </div>
-                                )} */}
                             </button>
                         })}
                     </React.Fragment>
                 })}
-            </div>
+            </div>) : (<div className='p-8 text-muted-foreground mt-4 text-center h-[calc(100vh-120px)] flex flex-col items-center justify-center'>
+                Nothing in Inbox
+            </div>)}
         </div>
     )
 }
