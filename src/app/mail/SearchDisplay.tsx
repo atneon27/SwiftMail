@@ -30,7 +30,7 @@ const SearchDisplay = () => {
         <div className="p-4 max-h-[calc(100vh-70px)] overflow-y-scroll">
             <div className="flex items-center gap-2 mb-4">
                 <h2 className='text-gray-600 dark:text-gray-400 text-md font-medium'>
-                    Search Results for "{searchValue}" came back with {search.data?.count ?? 0} matches
+                    Search Results for &qoute;{searchValue}&qoute; came back with {search.data?.count ?? 0} matches
                 </h2>
                 {search.isPending && <Loader2 className="size-4 animate-spin text-gray-400" />}
             </div>
@@ -48,7 +48,7 @@ const SearchDisplay = () => {
                                     From: {hit.document.from}
                                 </p>
                                 <p className="text-sm text-gray-500 font-medium">
-                                    To: {hit.document.to.join(", ")}
+                                    To: {(hit.document.to as string[]).join(", ")}
                                 </p>
                                 <p className="text-sm mt-2" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(hit.document.rawBody, { USE_PROFILES: { html: true } }) }} />
                             </div>

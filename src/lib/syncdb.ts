@@ -21,7 +21,7 @@ export async function syncEmailToDatabase(emails: EmailMessage[], accountId: str
         await orama.initialize()
 
         await Promise.all(emails.map(email => {
-            limit(async() => {
+            return limit(async() => {
                 const strippedBody = turndown.turndown(email.body ?? '')
                 
                 await orama.insert({
@@ -40,7 +40,7 @@ export async function syncEmailToDatabase(emails: EmailMessage[], accountId: str
         
         const result = await Promise.all(
             emails.map((email, idx) => {
-                limit(() => upsertEmail(email, idx, accountId))
+                return  limit(() => upsertEmail(email, idx, accountId))
             })
         );
 
@@ -149,14 +149,12 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
         }
 
         // spam model
-        let response = await fetch("https://api.apilayer.com/spamchecker?threshold=2.51", { 
+        const response = await fetch("https://api.apilayer.com/spamchecker?threshold=2.51", { 
             method: "POST",
             body: email.body ?? '',
             headers: {
-                "Accept": "*/*",
-                "User-Agent": "Thunder Client (https://www.thunderclient.com)",
-                "apikey": process.env.APILAYER_API_KEY as string,
-                "Content-Type": "text/plain"
+                "apikey": process.env.APILAYER_API_KEY!,
+                "Content-Type": "text/plain",
             }
         });
     

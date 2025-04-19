@@ -18,6 +18,15 @@ const AccountSwitcher = ({ isCollapsed }: Props) => {
     const { data } = api.account.getAccounts.useQuery()
     const [accountId, setAccountId] = useLocalStorage('accountId', "") 
 
+    const handleLoginRedirect = async () => {
+        try {
+            const aurinkoUrl = await getAurinkoAuthUrl('Google')    
+            window.location.href = aurinkoUrl
+        } catch(err) {
+            toast((err as Error).message)
+        }
+    }
+
     useEffect(() => {
         if(data && data.length > 0) {
             if(accountId && data.some(acc => acc.id === accountId)) return
@@ -29,13 +38,8 @@ const AccountSwitcher = ({ isCollapsed }: Props) => {
             toast('Link your email to get started', {
                 action: {
                     label: 'Link',
-                    onClick: async () => {
-                        try {
-                            const aurinkoUrl = await getAurinkoAuthUrl('Google')    
-                            window.location.href = aurinkoUrl
-                        } catch(err) {
-                            toast((err as Error).message)
-                        }
+                    onClick: () => {
+                        void handleLoginRedirect()
                     }
                 }
             })
@@ -113,8 +117,8 @@ const AccountSwitcher = ({ isCollapsed }: Props) => {
                             Sign Out
                         </div> */}
                         <button
-                            onClick={() => {
-                                handelAccountUnlink(accountId)
+                            onClick={async () => {
+                                await handelAccountUnlink(accountId)
                             }}
                             className='flex relative justify-start items-center w-full text-red-500 rounded-sm hover:bg-gray-50 cursor-pointer text-sm py-1.5 pr-2 pl-8 outline-none focus:bg-asccent'
                         >

@@ -13,8 +13,6 @@ import { Sidebar } from './Sidebar'
 import ThreadList from './ThreadList'
 import ThreadDisplay from './ThreadDisplay'
 import { useLocalStorage } from 'usehooks-ts'
-import { useThreads } from '@/hooks/use-thread'
-import { LinkAccountButton } from '@/components/LinkAccountButton'
 import SearchBar from './SearchBar'
 
 

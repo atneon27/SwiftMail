@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useThreads } from '@/hooks/use-thread'
-import { Archive, ArchiveX, Clock, MoreVertical, Trash2 } from 'lucide-react'
+import { Archive, Clock, MailQuestion, MoreVertical, Trash2 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +36,7 @@ const ThreadDisplay = () => {
                             <Archive className='size-4' />
                         </Button>
                         <Button variant={'ghost'} size={'icon'} disabled={!currThread} >
-                            <ArchiveX className='size-4' />
+                            <MailQuestion className='size-4' />
                         </Button>
                         <Button variant={'ghost'} size={'icon'} disabled={!currThread} >
                             <Trash2 className='size-4' />

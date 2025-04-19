@@ -40,13 +40,13 @@ const RecipentOptions = ({ placeholder, label, onChange, val }: Props) => {
                 onInputChange={setInputValue}
                 value={val}
                 className='w-full flex-1 dark:text-black'
-                // @ts-ignore
+                // @ts-expect-error: Handle Possible type mismatch
                 options={inputValue ? options?.concat({
-                    // @ts-ignore
+                    // @ts-expect-error: Handle Possible type mismatch
                     label: inputValue,
                     value: inputValue
                 }) : options}
-                // @ts-ignore
+                // @ts-expect-error: Handle Possible type mismatch
                 onChange={onChange}
                 placeholder={placeholder}
                 isMulti

@@ -35,7 +35,7 @@ const AIComposeButton = (props: Props) => {
         if(!props.isComposing) {
             for(const email of thread?.emails ?? []) {
                 const content = `
-                    from: ${email.from}
+                    from: ${email.from?.name ?? ''} <${email.from?.address ?? ''}>
                     subject: ${email.subject}
                     sentAt: ${new Date(email.sentAt).toLocaleString()}
                     Body: ${turndown.turndown(email.body ?? email.bodySnippet ?? '')}
@@ -69,7 +69,7 @@ const AIComposeButton = (props: Props) => {
                 <DialogHeader>
                     <DialogTitle>AI Email Compose</DialogTitle>
                     <DialogDescription>
-                        Auto Compose your email's with the help of AI
+                        Auto Compose your email&apos;s with the help of AI
                     </DialogDescription>
                     <div className='h-2'></div>
                     <textarea 
@@ -79,7 +79,7 @@ const AIComposeButton = (props: Props) => {
                         placeholder='Enter a prompt to generate an email'
                     />
                     <Button onClick={() => {
-                        generateResponse()
+                        void generateResponse()
                         setOpen(false)
                         setPrompt("")
                     }}>

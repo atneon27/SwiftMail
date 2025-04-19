@@ -7,9 +7,9 @@ import { createStreamableValue } from 'ai/rsc'
 export async function generateEmail(context: string, prompt: string) {
     const stream = createStreamableValue('');
 
-    (
+    void (
         async () => {
-            const { textStream } = await streamText({
+            const { textStream } = streamText({
                 model: openai('gpt-4o'),
                 prompt: `
                 You are a helpful AI embedded in a email client app that is used to answer questions about the emails in the inbox.
@@ -47,9 +47,9 @@ export async function generateEmail(context: string, prompt: string) {
 export async function autoGenerate(input: string) {
     const stream = createStreamableValue('');
 
-    (
+    void (
         async () => {
-            const { textStream } = await streamText({
+            const { textStream } = streamText({
                 model: openai('gpt-4o'),
                 prompt: `
                 ALWAYS RESPOND IN PLAIN TEXT, NOT IN HTML OR MARKDOWN

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Nav } from './Nav'
-import { File, Inbox, MailQuestion, MailWarning, Send } from 'lucide-react'
+import { File, Inbox, MailQuestion, Send } from 'lucide-react'
 import { useLocalStorage } from 'usehooks-ts'
 import { api } from '@/trpc/react'
 import BottomControl from './BottomControl'
@@ -16,27 +16,31 @@ export const Sidebar = ({ isCollapsed }: Props) => {
     const { data: inboxThread } = api.account.getNumThreads.useQuery({
         accountId,
         tab: 'inbox'
+    }, {
+        refetchInterval: 5000
     })
 
     const { data: draftThread } = api.account.getNumThreads.useQuery({
         accountId,
         tab: 'draft'
+    }, {
+        refetchInterval: 5000
     })
 
     const { data: sentThread } = api.account.getNumThreads.useQuery({
         accountId,
         tab: 'sent'
+    }, {
+        refetchInterval: 5000
     })
 
     const { data: spamThread } = api.account.getNumThreads.useQuery({
         accountId,
         tab: 'spam'
+    }, {
+        refetchInterval: 5000
     })
 
-    const { data: spoofThread } = api.account.getNumThreads.useQuery({
-        accountId,
-        tab: 'spoof'
-    })
 
     return (
         <div>

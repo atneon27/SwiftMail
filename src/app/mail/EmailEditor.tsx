@@ -66,7 +66,7 @@ const EmailEditor = ({
                 'Ctrl-j': () => {
                     const editor = this.editor;
                     const text = editor.getText()
-                    autoComplete(text, editor)
+                    void autoComplete(text, editor)
                     return true
                 }
             }

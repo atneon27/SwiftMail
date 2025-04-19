@@ -26,7 +26,7 @@ const Footer = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-2 gap-8">
+          {/* <div className="grid grid-cols-2 md:grid-cols-2 gap-8">
             <div>
               <h3 className="text-sm font-semibold mb-3">Product</h3>
               <ul className="space-y-2 text-sm">
@@ -43,7 +43,7 @@ const Footer = () => {
                 <li><a href="#" className="text-slate-600 dark:text-gray-200 hover:text-slate-900">Status</a></li>
               </ul>
             </div>
-          </div>
+          </div> */}
         </div>
         
         <Separator className="my-8" />
@@ -52,14 +52,14 @@ const Footer = () => {
           <p className="text-xs text-slate-500">
             &copy; {new Date().getFullYear()} Swift Mail. All rights reserved.
           </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
+          {/* <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-slate-500 dark:text-gray-300 hover:text-slate-900">
               Privacy
             </a>
             <a href="#" className="text-slate-500 dark:text-gray-300 hover:text-slate-900">
               Terms
             </a>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>
@@ -74,7 +74,7 @@ interface FeatureProps {
 
 const Feature = ({ icon, title, description }: FeatureProps) => {
     return (
-      <Card className="overflow-hidden border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-300 h-full">
+      <Card className="overflow-hidden border dark:border-slate-500 border-slate-200 hover:border-slate-300 hover:shadow-md transition-all duration-300 h-full">
         <CardContent className="p-6 flex flex-col items-center text-center">
           <div className="rounded-full p-3 bg-blue-50 mb-4">
             {icon}
@@ -99,12 +99,12 @@ const Home = async() =>  {
         <>
             {/* <div className="h-screen w-full bg-white absolute inset-0">
             </div> */}
-            <div className="absolute z-[-1] bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_80%)]">
+            <div className="absolute z-[-1] bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_80%)]">
             </div>
             <div className="min-h-screen flex flex-col items-center pt-56 relative z-[10]">
-                <section className="container px-4 pt-16 md:pt-24 lg:pt-32 pb-12 md:pb-20 flex flex-col items-center relative z-[10]">
+                <section className="container px-4 pt-16 md:pt-24 lg:pt-32 pb-12 md:pb-20 flex flex-col items-center relative z-[10] bg-slate-">
                     <div className="space-y-4 text-center max-w-3xl mx-auto">
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter bg-gradient-to-r from-slate-900 to-slate-700 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent animate-fade-in">
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter bg-gradient-to-r from-slate-900 to-slate-700 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent animate-fade-in bg-gray-">
                         The minimalistic,<br />
                         AI-powered email client.
                     </h1>
@@ -121,19 +121,6 @@ const Home = async() =>  {
                         </Link>
                     </div>
                     </div>
-                    
-                    {/* Mockup Image */}
-                    {/* <div className="w-full max-w-5xl mx-auto mt-16 md:mt-24 overflow-hidden rounded-xl shadow-2xl animate-scale-in">
-                      <div className="relative bg-slate-900 h-8 flex items-center px-4">
-                          <div className="flex space-x-2 absolute left-4">
-                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                          </div>
-                          <div className="w-full text-center text-xs text-slate-400">Swift Mail - Inbox</div>
-                      </div>
-                      {/* <div className="bg-white h-[300px] md:h-[400px] p-4 bg-[url('/public/mailbox_light.png')] dark:bg-[url('/public/mailbox_dark.png')] bg-cover bg-center"></div> */}
-                    {/* </div>  */}
 
                     <div className="w-full max-w-4xl mx-auto mt-16 md:mt-24 overflow-hidden rounded-xl shadow-2xl animate-scale-in">
                       <div className="relative bg-slate-900 h-8 flex items-center px-4">

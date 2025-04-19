@@ -9,7 +9,6 @@ export const isSearchingAtom = atom(false)
 const SearchBar = () => {
     const [searchValue, setSearchValue] = useAtom(searchValueAtom)
     const [isSearching, setIsSearching] = useAtom(isSearchingAtom)
-    const { isFetching } = useThreads()
 
     const handelBlur = () => {
         if(searchValue != '') return

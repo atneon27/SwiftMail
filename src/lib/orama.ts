@@ -4,7 +4,7 @@ import { db } from "@/server/db"
 import { endOfDay } from "date-fns";
 
 export class OramaClient {
-    // @ts-ignore
+    // @ts-expect-error: Type mismatch between Orama and AnyOrama
     private orama: AnyOrama;
     private accountId: string;
 
@@ -23,7 +23,7 @@ export class OramaClient {
         if (account.oramaIndex) {
             this.orama = await restore('json', account.oramaIndex as any);
         } else {
-            this.orama = await create({
+            this.orama = create({
                 schema: {
                     subject: "string",
                     body: "string",
@@ -41,7 +41,7 @@ export class OramaClient {
     async insert(document: any) {
         if(!this.orama) throw new Error("orama is not initalized")
         await insert(this.orama, document);
-        this.saveIndex()
+        await this.saveIndex()
     }
 
     async search({ term }: { term: string }) {

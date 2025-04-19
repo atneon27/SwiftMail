@@ -12,7 +12,7 @@ export const useThreads = () => {
 
     const [threadId, setThreadId] = useAtom(threadIdAtom)
 
-    const { data: threads, isFetching, refetch } = api.account.getThreads.useQuery({
+    const { data: threads, isFetching, refetch, isPending } = api.account.getThreads.useQuery({
         accountId, 
         tab, 
         done
@@ -25,6 +25,7 @@ export const useThreads = () => {
     return {
         threads,
         isFetching,
+        isPending,
         refetch,
         accountId,
         threadId,
