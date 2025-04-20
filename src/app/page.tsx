@@ -4,7 +4,7 @@ import { Button  } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from "next/navigation";
-import { ArrowRight, Mail, Search, Command } from "lucide-react";
+import { ArrowRight, Search, Command, MailQuestion } from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card";
 
 import { Separator } from "@/components/ui/separator";
@@ -53,10 +53,10 @@ const Footer = () => {
             &copy; {new Date().getFullYear()} Swift Mail. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-slate-500 dark:text-gray-300 hover:text-slate-900">
+            <a href="/privacy" className="text-slate-500 dark:text-gray-300 hover:text-slate-900">
               Privacy
             </a>
-            <a href="#" className="text-slate-500 dark:text-gray-300 hover:text-slate-900">
+            <a href="/terms" className="text-slate-500 dark:text-gray-300 hover:text-slate-900">
               Terms
             </a>
           </div>
@@ -86,8 +86,6 @@ const Feature = ({ icon, title, description }: FeatureProps) => {
     );
   };
 
-
-
 const Home = async() =>  { 
     const { userId } = await auth()
 
@@ -105,8 +103,7 @@ const Home = async() =>  {
                 <section className="container px-4 pt-16 md:pt-24 lg:pt-32 pb-12 md:pb-20 flex flex-col items-center relative z-[10] bg-slate-">
                     <div className="space-y-4 text-center max-w-3xl mx-auto">
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter bg-gradient-to-r from-slate-900 to-slate-700 dark:from-gray-100 dark:to-gray-400 bg-clip-text text-transparent animate-fade-in bg-gray-">
-                        The minimalistic,<br />
-                        AI-powered email client.
+                        Crafted for focus. Powered by AI. Only on desktop
                     </h1>
                     <p className="text-lg md:text-xl text-slate-600 dark:text-gray-200 max-w-2xl mx-auto animate-fade-in">
                         Swift Mail is a minimalistic, AI-powered email client that
@@ -140,9 +137,9 @@ const Home = async() =>  {
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <Feature 
-                        icon={<Mail className="h-8 w-8 text-blue-600" />}
-                        title="AI-driven email RAG"
-                        description="Automatically prioritize your emails with our advanced AI system that learns from your habits."
+                        icon={<MailQuestion className="h-8 w-8 text-blue-600" />}
+                        title="Robust Spam Filter"
+                        description="Automatically segregate your harmful and malicious emails as spam with roubust spam filtering." 
                     />
                     
                     <Feature 
