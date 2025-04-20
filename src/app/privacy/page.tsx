@@ -1,5 +1,8 @@
 import ThemeToggle from '@/components/ThemeToggle';
 import React from 'react';
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const PrivacyPolicyPage = () => {
     return (
@@ -103,6 +106,14 @@ const PrivacyPolicyPage = () => {
                     updated Privacy Statement for 30 days. By continuing to use our websites and services after a revision takes effect,
                     it is considered that users have read and understand the changes.
                 </p>
+            </div>
+            <div className="flex flex-row justify-center p-5">
+                <Link href="/">
+                    <Button>
+                        <ArrowLeft className="size-5" />
+                        Back
+                    </Button>
+                </Link>
             </div>
         </div>
     );
