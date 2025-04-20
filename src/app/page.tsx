@@ -52,14 +52,14 @@ const Footer = () => {
           <p className="text-xs text-slate-500">
             &copy; {new Date().getFullYear()} Swift Mail. All rights reserved.
           </p>
-          {/* <div className="flex space-x-6 mt-4 md:mt-0">
+          <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-slate-500 dark:text-gray-300 hover:text-slate-900">
               Privacy
             </a>
             <a href="#" className="text-slate-500 dark:text-gray-300 hover:text-slate-900">
               Terms
             </a>
-          </div> */}
+          </div>
         </div>
       </div>
     </footer>
