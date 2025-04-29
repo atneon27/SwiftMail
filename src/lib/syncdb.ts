@@ -176,7 +176,6 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                     accountId: accountId,
                     subject: email.subject ?? '',
                     lastMessageDate: new Date(email.sentAt),
-                    done: false,
                     participantIds: [...new Set([
                         fromAddress.id,
                         ...toAddress.map(a => a.id),
@@ -188,8 +187,6 @@ async function upsertEmail(email: EmailMessage, idx: number, accountId: string) 
                     id: email.threadId,
                     accountId,
                     subject: email.subject ?? '',
-                    done: false,
-                    // revert the changes made
                     inboxStatus:  emailLabelType === 'inbox',
                     sentStatus: emailLabelType === 'sent',
                     draftStatus: emailLabelType === 'draft',

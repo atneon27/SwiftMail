@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { emailAddressSchema } from "@/lib/types";
 import { Account } from "@/lib/accounts";
 import { OramaClient } from "@/lib/orama";
+import { threadId } from "worker_threads";
 
 const hasAccess = async (accountId: string, userId: string) => {
     const account = await db.account.findFirst({
@@ -48,8 +49,7 @@ export const accountRouter = createTRPCRouter({
                 inboxStatus: input.tab === 'inbox' ? true : false,
                 sentStatus: input.tab === 'sent' ? true : false,
                 draftStatus: input.tab === 'draft' ? true : false,
-                spamStatus: input.tab === 'spam' ? true : false,
-                spoofStatus: input.tab === 'spoof' ? true : false
+                spamStatus: input.tab === 'spam' ? true : false, 
             }
         })
         
@@ -58,13 +58,49 @@ export const accountRouter = createTRPCRouter({
     getThreads: privateProcedure.input(z.object({
         accountId: z.string(),
         tab: z.string(),
-        done: z.boolean()
+        opened: z.optional(z.boolean())
     })).query(async ({ctx, input}) => { 
         const account = await hasAccess(input.accountId, ctx.auth.userId);
         const acc = new Account(input.accountId, account.accessToken)
     
         await acc.syncEmails().catch(console.error)
         
+        if(input.opened) {
+            const data = await ctx.db.thread.findMany({
+                where: {
+                    accountId: input.accountId,
+                    inboxStatus: input.tab === 'inbox' ? true : false,
+                    sentStatus: input.tab === 'sent' ? true : false,
+                    draftStatus: input.tab === 'draft' ? true : false,
+                    spamStatus: input.tab === 'spam' ? true : false,
+                    opened: input.opened
+                }, 
+                include: {
+                    emails: {
+                        orderBy: {
+                            sentAt: 'asc'
+                        }, 
+                        select: {
+                            from: true,
+                            body: true,
+                            bodySnippet: true,
+                            emailLabel: true,
+                            subject: true,
+                            id: true,
+                            sentAt: true,
+                            sysLabels: true
+                        }
+                    }
+                },
+                take: 40,
+                orderBy: {
+                    lastMessageDate: 'desc'
+                }
+            })
+
+            return data
+        } 
+
         const data = await ctx.db.thread.findMany({
             where: {
                 accountId: input.accountId,
@@ -72,8 +108,6 @@ export const accountRouter = createTRPCRouter({
                 sentStatus: input.tab === 'sent' ? true : false,
                 draftStatus: input.tab === 'draft' ? true : false,
                 spamStatus: input.tab === 'spam' ? true : false,
-                spoofStatus: input.tab === 'spoof' ? true : false,
-                done: input.done
             }, 
             include: {
                 emails: {
@@ -232,6 +266,124 @@ export const accountRouter = createTRPCRouter({
 
         return await orama.search({
             term: input.query
+        })
+    }),
+    markAsRead: privateProcedure.input(z.object({
+        accountId: z.string(),
+        threadId: z.string()
+    })).mutation(async({ctx, input}) => {
+        const account = await hasAccess(input.accountId, ctx.auth.userId)
+
+        const threadId = await db.thread.findUnique({
+            where: {
+                id: input.threadId
+            }
+        })
+
+        if(!threadId) throw new Error("No such thread exists!!")
+
+        await db.thread.update({
+            where: {
+                id: input.threadId
+            }, 
+            data: {
+                opened: true
+            }
+        })
+    }),
+    markAsUnread: privateProcedure.input(z.object({
+        accountId: z.string(),
+        threadId: z.string()
+    })).mutation(async ({ctx, input}) => {
+        const account = await hasAccess(input.accountId, ctx.auth.userId)
+
+        const threadId = await db.thread.findUnique({
+            where: {
+                id: input.threadId
+            }
+        })
+
+        if(!threadId) throw new Error("No such thread exists!!")
+
+        await db.thread.update({
+            where: {
+                id: input.threadId
+            }, 
+            data: {
+                opened: false
+            }
+        })
+    }),
+    markNotSpam: privateProcedure.input(z.object({
+        accountId: z.string(),
+        threadId: z.string()
+    })).mutation(async ({ctx, input}) => {
+        const account = await hasAccess(input.accountId, ctx.auth.userId)
+        
+        const threadId = await db.thread.findUnique({
+            where: {
+                id: input.threadId
+            }
+        })
+
+        if(!threadId) throw new Error("No such thread exists!!")
+
+        await db.thread.update({
+            where: {
+                id: input.threadId
+            }, 
+            data: {
+                spamStatus: false
+            }
+        })
+    }),
+    deleteThread: privateProcedure.input(z.object({
+        accountId: z.string(),
+        threadId: z.string()
+    })).mutation(async ({ctx, input}) => {
+        const account = await hasAccess(input.accountId, ctx.auth.userId)
+
+        const threadId = await db.thread.findUnique({
+            where: {
+                id: input.threadId
+            }
+        })
+
+        if(!threadId) throw new Error("No such thread exists!!")
+        
+        await db.email.deleteMany({
+            where: {
+                threadId: input.threadId
+            }
+        })
+
+        await db.thread.delete({
+            where: {
+                id: input.threadId
+            }
+        })
+    }),
+    starThread: privateProcedure.input(z.object({
+        accountId: z.string(),
+        threadId: z.string()
+    })).mutation(async ({ctx, input}) => {
+        const account = await hasAccess(input.accountId, ctx.auth.userId)
+
+        const threadId = await db.thread.findUnique({
+            where: {
+                id: input.threadId
+            }
+        })
+
+        if(!threadId) throw new Error("No such thread exists!!")
+        
+        await db.thread.update({
+            where: {
+                id: input.threadId
+            }, 
+            data: {
+                starred: true
+            }
         })
     })
 })

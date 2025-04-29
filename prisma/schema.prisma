@@ -42,22 +42,21 @@ model Thread {
     accountId       String
     account         Account  @relation(fields: [accountId], references: [id])
 
-    done        Boolean @default(false)
+    starred     Boolean @default(false)
+    opened      Boolean @default(false)
     inboxStatus Boolean @default(true)
     draftStatus Boolean @default(false)
     sentStatus  Boolean @default(false)
     spamStatus  Boolean @default(false)
-    spoofStatus Boolean @default(false)
 
     emails Email[]
 
     @@index([accountId])
-    @@index([done])
+    @@index([opened])
     @@index([inboxStatus])
     @@index([draftStatus])
     @@index([sentStatus])
     @@index([spamStatus])
-    @@index([spoofStatus])
     @@index([lastMessageDate])
 }
 

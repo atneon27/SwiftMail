@@ -8,18 +8,18 @@ export const useThreads = () => {
     const { data: accounts } = api.account.getAccounts.useQuery()
     const [accountId] = useLocalStorage('accountId', '')
     const [tab] = useLocalStorage('swiftmail-tab', 'inbox')
-    const [done] = useLocalStorage('swiftmail-done', false)
+    const [opened] = useLocalStorage('smail-done', false)
 
     const [threadId, setThreadId] = useAtom(threadIdAtom)
 
     const { data: threads, isFetching, refetch, isPending } = api.account.getThreads.useQuery({
         accountId, 
         tab, 
-        done
+        opened
     }, {
         enabled: !!accountId && !!tab,
         placeholderData: e => e,
-        refetchInterval: 10000
+        refetchInterval: 3000
     })
 
     return {

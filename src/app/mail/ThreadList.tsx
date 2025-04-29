@@ -5,12 +5,17 @@ import { useThreads } from '@/hooks/use-thread'
 import React from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
 import { cn } from '@/lib/utils'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Star } from 'lucide-react'
 import { useLocalStorage } from 'usehooks-ts'
+import { api } from '@/trpc/react'
+import { toast } from 'sonner'
 
 const ThreadList = () => {
     const { threads, threadId, setThreadId, isFetching, isPending } = useThreads()
     const [tab] = useLocalStorage<'inbox' | 'draft' | 'sent' | 'spam' | 'spoof'>('swiftmail-tab', 'inbox')
+    const [accountId] = useLocalStorage('accountId', '')
+
+    const markAsRead = api.account.markAsRead.useMutation()
 
     const groupedThreads = threads?.reduce((acc, thread) => {
         const date = format(thread.emails[0]?.sentAt ?? new Date(), 'dd-MM-yyyy')
@@ -20,6 +25,19 @@ const ThreadList = () => {
         acc[date].push(thread)
         return acc
     }, {} as Record<string, typeof threads>)
+
+    const handleClick = (threadId: string) => {
+        setThreadId(threadId)
+        markAsRead.mutate({
+            accountId: accountId,
+            threadId: threadId
+        }, {
+            onError: (error) => {
+                console.log(error)
+                toast.error("Error in marking the mail as read!!")
+            }
+        })
+    }
 
     return (
         <div className='max-w-full overflow-y-scroll max-h-[calc(100vh-130px)]'>
@@ -38,7 +56,9 @@ const ThreadList = () => {
                             {threads.map((thread) => (
                                 <button
                                     key={thread.id}
-                                    onClick={() => setThreadId(thread.id)}
+                                    onClick={() => {
+                                        handleClick(thread.id ?? '')
+                                    }}
                                     className={cn(
                                         'flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all relative',
                                         {
@@ -49,6 +69,7 @@ const ThreadList = () => {
                                     <div className='flex flex-col w-full gap-2'>
                                         <div className='flex items-center'>
                                             <div className='flex items-center gap-2'>
+                                                {thread.starred && <Star size={14} fill='#FFF085   ' strokeWidth={1} />}
                                                 <div className='font-semibold'>
                                                     {thread.emails.at(-1)?.from.name ?? thread.subject}
                                                 </div>
@@ -79,7 +100,6 @@ const ThreadList = () => {
             ) : (
                 <div className='p-8 text-muted-foreground mt-4 text-center h-[calc(100vh-120px)] flex flex-col items-center justify-center'>
                     Nothing in {tab === 'inbox' ? 'Inbox' : tab === 'draft' ? 'Draft' : tab === 'sent' ? 'Sent' : 'Spam'}
-
                 </div>
             )}
         </div>

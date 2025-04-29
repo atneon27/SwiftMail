@@ -57,7 +57,7 @@ const AccountSwitcher = ({ isCollapsed }: Props) => {
             },
             onError: (error) => {
                 console.log(error)
-                toast.success("Error Unlinking Account")
+                toast.error("Error Unlinking Account")
             }
         })
         setAccountId("")

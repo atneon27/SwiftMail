@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useThreads } from '@/hooks/use-thread'
-import { Archive, Clock, MailQuestion, MoreVertical, Trash2 } from 'lucide-react'
+import { Clock, MailQuestion, MoreVertical, PanelTopDashed, Trash2 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,29 +16,110 @@ import ReplyBox from './ReplyBox'
 import { useAtom } from 'jotai'
 import { isSearchingAtom } from './SearchBar'
 import SearchDisplay from './SearchDisplay'
+import { api } from '@/trpc/react'
+import { useLocalStorage } from 'usehooks-ts'
+import { toast } from 'sonner'
 
 
 
 const ThreadDisplay = () => {
     const {threads, threadId} = useThreads()
+    const [accountId] = useLocalStorage('accountId', '')
     const [isSearching] = useAtom(isSearchingAtom)
+
+    const markAsUnread = api.account.markAsUnread.useMutation()
+    const markNotSpam = api.account.markNotSpam.useMutation()
+    const starThread = api.account.starThread.useMutation()
+    const deleteThread = api.account.deleteThread.useMutation()
 
     const currThread = threads?.find((thread) => {
         return thread.id === threadId
     })
+
+    const handleMarkUnread = (threadId: string) => {
+        markAsUnread.mutate({
+            accountId,
+            threadId
+        }, {
+            onSuccess: () => {
+                toast.success("Marked as Unread")
+            },
+            onError: () => {
+                toast.error("Error, while marking thread as unread")
+            }
+        })   
+    }
+
+    const handleMarkNotSpam = (threadId: string) => {
+        markNotSpam.mutate({
+            accountId,
+            threadId
+        }, {
+            onSuccess: () => {
+                toast.success("Marked Not as Spam")
+            },
+            onError: () => {
+                toast.error("Error, while marking thread not as spam")
+            }
+        })
+    }
+
+    const handleStarThread = (threadId: string) => {
+        starThread.mutate({
+            accountId,
+            threadId
+        }, {
+            onSuccess: () => {
+                toast.success("Star marked the thread")
+            },
+            onError: () => {
+                toast.error("Error, while star marking the thread")
+            }
+        })
+    }
+
+    const handleDeleteThread = (threadId: string) => {
+        deleteThread.mutate({
+            accountId,
+            threadId
+        }, {
+            onSuccess: () => {
+                toast.success("Thread Deleted Successfully")
+            },
+            onError: () => {
+                toast.error("Error, while deleting the thread!!")
+            }
+        })
+    }
 
     return (
         <div className="flex flex-col h-full">
             <div className='flex flex-row'>
                 <div className="flex items-center p-2">
                     <div className='flex items-center gap-2'>
-                        <Button variant={'ghost'} size={'icon'} disabled={!currThread} >
+                        {/* <Button variant={'ghost'} size={'icon'} disabled={!currThread} >
                             <Archive className='size-4' />
-                        </Button>
-                        <Button variant={'ghost'} size={'icon'} disabled={!currThread} >
+                        </Button> */}
+                        {/* Mark as not spam button */}
+                        <Button 
+                            onClick={() => {
+                                handleMarkNotSpam(threadId ?? '')
+                            }}
+                            variant={'ghost'} 
+                            size={'icon'} 
+                            disabled={!currThread} 
+                        >
                             <MailQuestion className='size-4' />
                         </Button>
-                        <Button variant={'ghost'} size={'icon'} disabled={!currThread} >
+                        {/* delete thread button */}
+                        <Button 
+                            onClick={() => {
+                                handleDeleteThread(threadId ?? '')
+                            }}
+                            variant={'ghost'} 
+                            size={'icon'} 
+                            disabled={!currThread} 
+                        >
                             <Trash2 className='size-4' />
                         </Button>
                     </div> 
@@ -56,10 +137,10 @@ const ThreadDisplay = () => {
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align='end'>
-                            <DropdownMenuItem>Mark As Unread</DropdownMenuItem>
-                            <DropdownMenuItem>Star Thread</DropdownMenuItem>
-                            <DropdownMenuItem>Add Label</DropdownMenuItem>
-                            <DropdownMenuItem>Mute Thread</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleMarkUnread(threadId ?? '')}>Mark As Unread</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleStarThread(threadId ?? '')}>Star Thread</DropdownMenuItem>
+                            {/* <DropdownMenuItem>Add Label</DropdownMenuItem>
+                            <DropdownMenuItem>Mute Thread</DropdownMenuItem> */}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

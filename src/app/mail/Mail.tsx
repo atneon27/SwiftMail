@@ -23,20 +23,9 @@ type Props = {
 }
 
 export const Mail = ({ defaultLayout = [15, 35, 50], navCollapsedSize, defaultCollapsed = false }: Props) => {
-    // const data = localStorage.getItem('accountId')
     const [done, setDone] = useLocalStorage('smail-done', false)
     const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed)
 
-    // if(!data) {
-    //     return (
-    //         <div className="m-4 flex items-center gap-4">
-    //             <LinkAccountButton ButtonText="Login with Google" />
-    //             <div className="pl-4">
-    //             Click the login button to add you google account
-    //             </div>
-    //         </div> 
-    //     )
-    // }
     
     return (
         <TooltipProvider delayDuration={0} >
@@ -84,10 +73,10 @@ export const Mail = ({ defaultLayout = [15, 35, 50], navCollapsedSize, defaultCo
                     // collapsible={false}
                     minSize={30}
                 >
-                    <Tabs defaultValue='inbox' value={done ? 'done' : 'inbox'} onValueChange={tab => {
-                        if (tab === 'done') {
+                    <Tabs defaultValue='inbox' value={done ? 'done' : 'inbox'} onValueChange={selector => {
+                        if (selector === 'done') {
                             setDone(true)
-                        } else if (tab === 'inbox') {
+                        } else if (selector === 'inbox') {
                             setDone(false)
                         }
                     }}>
