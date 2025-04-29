@@ -128,7 +128,7 @@ const Home = async() =>  {
                           </div>
                           <div className="w-full text-center text-xs text-gray-200">Swift Mail - Inbox</div>
                       </div>
-                      <div className="bg-white dark:bg-black h-[500px] md:h-[450px] p-4 bg-[url('/mailbox_light.png')] dark:bg-[url('/mailbox_dark.png')] bg-contain bg-no-repeat"></div>
+                      <div className="bg-white dark:bg-black h-[500px] md:h-[450px] p-4 bg-[url('public/images/mailbox_light.png')] dark:bg-[url('public/images/mailbox_dark.png')] bg-contain bg-no-repeat"></div>
                   </div>
                 </section>
 
